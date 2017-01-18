@@ -1,4 +1,4 @@
-package com.qburst.plugin.android.actions;
+package com.qburst.plugin.android.amature.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

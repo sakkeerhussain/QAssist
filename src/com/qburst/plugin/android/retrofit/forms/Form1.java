@@ -1,20 +1,17 @@
-package com.qburst.plugin.android.forms.retrofit;
+package com.qburst.plugin.android.retrofit.forms;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.qburst.plugin.android.actions.RetrofitIntegrator;
+import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created by sakkeer on 11/01/17.
  */
 public class Form1 {
-    private static JFrame frame;
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -27,12 +24,9 @@ public class Form1 {
     private Project project;
     private Module[] modules;
 
-    public Form1() {
-        cancelButton.addActionListener(e -> hide());
-        finishButton.addActionListener(e -> {
-            // TODO: 11/01/17 Do integrate REST API to that project.
-            hide();
-        });
+    private Form1() {
+        cancelButton.addActionListener(e -> controller.hideForm());
+        //finishButton.addActionListener(e -> {});
         nextButton.addActionListener(e -> {
             String noOfEndPointsString = noOfEndPointsTextField.getText();
             int noOfEndPoints = 0;
@@ -50,14 +44,7 @@ public class Form1 {
         });
     }
 
-    public void hide() {
-        if (frame != null){
-            frame.setVisible(false);
-        }
-    }
-
-    public static Form1 main(String[] args) {
-        frame = new JFrame("Form 1");
+    public static Form1 main(String[] args, JFrame frame) {
         Form1 form = new Form1();
         frame.setContentPane(form.rootPanel);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -75,9 +62,5 @@ public class Form1 {
             modulesList.addItem(module.getName());
         }
         this.controller.setModuleSelected(modules[0]);
-    }
-
-    public boolean isShowing(){
-        return frame.isShowing();
     }
 }
