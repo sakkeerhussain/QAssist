@@ -13,11 +13,6 @@ import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
@@ -25,14 +20,10 @@ import com.qburst.plugin.android.retrofit.forms.Form3;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.jps.model.serialization.PathMacroUtil;
 
 import javax.swing.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.intellij.openapi.vfs.VfsUtilCore.isEqualOrAncestor;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -59,14 +50,19 @@ public class RetrofitIntegrator extends AnAction {
         Log.d(TAG, "openForm1() called");
         String[] flags = new String[0];
         Form1 form1 = Form1.main(flags, frame);
-        form1.setData(this, project);
+        form1.setData(this, project, baseUrl, noOfEndPoints, moduleSelected);
     }
 
-    public void openForm2(){
+    public void openForm2(boolean fromStart){
         Log.d(TAG, "openForm2() called");
         String[] flags = new String[0];
-        Form2 form2 = Form2.main(flags, frame);
-        form2.setData(this);
+        Form2 form = Form2.main(flags, frame);
+        form.setData(this);
+        if (fromStart) {
+            form.setCurrentEndPoint(1);
+        }else{
+            form.setCurrentEndPoint(this.noOfEndPoints);
+        }
     }
 
     public void openForm3(){
@@ -81,8 +77,16 @@ public class RetrofitIntegrator extends AnAction {
         frame.setVisible(false);
     }
 
+    public void setTitle(String title){
+        frame.setTitle("Retrofit - "+title);
+    }
+
     public void setModuleSelected(Module moduleSelected) {
         this.moduleSelected = moduleSelected;
+    }
+
+    public int getNoOfEndPoints() {
+        return noOfEndPoints;
     }
 
     public void integrateRetrofit() {

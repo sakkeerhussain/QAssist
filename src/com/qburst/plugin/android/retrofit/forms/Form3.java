@@ -23,7 +23,7 @@ public class Form3 {
             controller.integrateRetrofit();
             controller.hideForm();
         });
-        previousButton.addActionListener(e -> controller.openForm2());
+        previousButton.addActionListener(e -> controller.openForm2(false));
         //nextButton.addActionListener(e -> {});
     }
 
@@ -39,5 +39,6 @@ public class Form3 {
 
     public void setData(RetrofitIntegrator controller){
         this.controller = controller;
+        this.controller.setTitle("Confirm");
     }
 }

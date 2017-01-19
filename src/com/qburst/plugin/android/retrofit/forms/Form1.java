@@ -7,6 +7,10 @@ import com.intellij.openapi.ui.Messages;
 import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -28,6 +32,18 @@ public class Form1 {
         cancelButton.addActionListener(e -> controller.hideForm());
         //finishButton.addActionListener(e -> {});
         nextButton.addActionListener(e -> {
+
+            String baseUrl = baseUrlTextField.getText();
+            try {
+                URL url = new URL(baseUrl);
+                URLConnection conn = url.openConnection();
+                conn.connect();
+            } catch (MalformedURLException exp) {
+                Messages.showMessageDialog(project, "Invalid base URL provided.",
+                        "Exception", Messages.getInformationIcon());
+                return;
+            } catch (IOException e1) {}
+
             String noOfEndPointsString = noOfEndPointsTextField.getText();
             int noOfEndPoints = 0;
             try {
@@ -37,10 +53,11 @@ public class Form1 {
                         "Exception", Messages.getInformationIcon());
                 return;
             }
-            controller.setBaseUrl(baseUrlTextField.getText());
+
+            controller.setBaseUrl(baseUrl);
             controller.setNoOfEndPoints(noOfEndPoints);
             controller.setModuleSelected(modules[modulesList.getSelectedIndex()]);
-            controller.openForm2();
+            controller.openForm2(true);
         });
     }
 
@@ -54,7 +71,7 @@ public class Form1 {
         return form;
     }
 
-    public void setData(RetrofitIntegrator controller, Project project){
+    public void setData(RetrofitIntegrator controller, Project project, String baseUrl, int noOfEndPoints, Module moduleSelected){
         this.controller = controller;
         this.project = project;
         modules = ModuleManager.getInstance(project).getModules();
@@ -62,5 +79,16 @@ public class Form1 {
             modulesList.addItem(module.getName());
         }
         this.controller.setModuleSelected(modules[0]);
+        this.controller.setTitle("base config");
+
+        if (baseUrl != null){
+            baseUrlTextField.setText(baseUrl);
+        }
+        if (noOfEndPoints != 0){
+            noOfEndPointsTextField.setText(String.valueOf(noOfEndPoints));
+        }
+        if (moduleSelected != null){
+            modulesList.setSelectedItem(moduleSelected);
+        }
     }
 }

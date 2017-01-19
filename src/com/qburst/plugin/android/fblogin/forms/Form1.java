@@ -44,7 +44,7 @@ public class Form1 {
             controller.setBaseUrl(baseUrlTextField.getText());
             controller.setNoOfEndPoints(noOfEndPoints);
             controller.setModuleSelected(modules[modulesList.getSelectedIndex()]);
-            controller.openForm2();
+            controller.openForm2(true);
         });
     }
 

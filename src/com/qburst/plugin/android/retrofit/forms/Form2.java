@@ -10,6 +10,7 @@ import javax.swing.*;
  */
 public class Form2 {
     private static final String TAG = "Form2";
+    private int currentEndPoint;
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -22,8 +23,26 @@ public class Form2 {
         cancelButton.addActionListener(e -> controller.hideForm());
         /*finishButton.addActionListener(e -> {
         });*/
-        previousButton.addActionListener(e -> controller.openForm1());
-        nextButton.addActionListener(e -> controller.openForm3());
+        previousButton.addActionListener(e -> {
+            if (currentEndPoint <= 1){
+                controller.openForm1();
+            }else{
+                currentEndPoint--;
+                setUpView();
+            }
+        });
+        nextButton.addActionListener(e -> {
+            if (currentEndPoint > controller.getNoOfEndPoints()){
+                controller.openForm3();
+            }else{
+                currentEndPoint++;
+                setUpView();
+            }
+        });
+    }
+
+    private void setUpView() {
+        controller.setTitle("End point "+currentEndPoint);
     }
 
     public static Form2 main(String[] args, JFrame frame) {
@@ -39,5 +58,10 @@ public class Form2 {
 
     public void setData(RetrofitIntegrator controller){
         this.controller = controller;
+    }
+
+    public void setCurrentEndPoint(int currentEndPoint) {
+        this.currentEndPoint = currentEndPoint;
+        setUpView();
     }
 }
