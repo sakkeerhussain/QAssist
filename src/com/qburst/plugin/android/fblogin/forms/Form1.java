@@ -4,7 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
+import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
 
@@ -21,7 +21,7 @@ public class Form1 {
     private JButton nextButton;
     private JComboBox modulesList;
 
-    private RetrofitIntegrator controller;
+    private RetrofitController controller;
     private Project project;
     private Module[] modules;
 
@@ -65,7 +65,7 @@ public class Form1 {
         return form;
     }
 
-    public void setData(RetrofitIntegrator controller, Project project){
+    public void setData(RetrofitController controller, Project project){
         this.controller = controller;
         this.project = project;
         modules = ModuleManager.getInstance(project).getModules();

@@ -1,6 +1,6 @@
 package com.qburst.plugin.android.retrofit.forms;
 
-import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
+import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
 
@@ -14,7 +14,7 @@ public class Form3 {
     private JButton nextButton;
     private JButton previousButton;
 
-    private RetrofitIntegrator controller;
+    private RetrofitController controller;
 
     private Form3() {
         cancelButton.addActionListener(e -> controller.hideForm());
@@ -37,7 +37,7 @@ public class Form3 {
         return form;
     }
 
-    public void setData(RetrofitIntegrator controller){
+    public void setData(RetrofitController controller){
         this.controller = controller;
         this.controller.setTitle("Confirm");
     }

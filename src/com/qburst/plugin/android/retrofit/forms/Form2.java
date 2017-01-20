@@ -1,6 +1,6 @@
 package com.qburst.plugin.android.retrofit.forms;
 
-import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
+import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class Form2 {
     private JButton nextButton;
     private JButton previousButton;
 
-    private RetrofitIntegrator controller;
+    private RetrofitController controller;
 
     private Form2() {
         cancelButton.addActionListener(e -> controller.hideForm());
@@ -32,7 +32,7 @@ public class Form2 {
             }
         });
         nextButton.addActionListener(e -> {
-            if (currentEndPoint > controller.getNoOfEndPoints()){
+            if (currentEndPoint >= controller.getNoOfEndPoints()){
                 controller.openForm3();
             }else{
                 currentEndPoint++;
@@ -56,7 +56,7 @@ public class Form2 {
         return form;
     }
 
-    public void setData(RetrofitIntegrator controller){
+    public void setData(RetrofitController controller){
         this.controller = controller;
     }
 

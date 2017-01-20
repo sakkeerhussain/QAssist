@@ -4,7 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.qburst.plugin.android.retrofit.actions.RetrofitIntegrator;
+import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class Form1 {
     private JButton nextButton;
     private JComboBox modulesList;
 
-    private RetrofitIntegrator controller;
+    private RetrofitController controller;
     private Project project;
     private Module[] modules;
 
@@ -71,7 +71,7 @@ public class Form1 {
         return form;
     }
 
-    public void setData(RetrofitIntegrator controller, Project project, String baseUrl, int noOfEndPoints, Module moduleSelected){
+    public void setData(RetrofitController controller, Project project, String baseUrl, int noOfEndPoints, Module moduleSelected){
         this.controller = controller;
         this.project = project;
         modules = ModuleManager.getInstance(project).getModules();
@@ -81,10 +81,14 @@ public class Form1 {
         this.controller.setModuleSelected(modules[0]);
         this.controller.setTitle("base config");
 
-        if (baseUrl != null){
+        if (baseUrl == null || baseUrl.equals("")){
+            baseUrlTextField.setText("http://");
+        }else{
             baseUrlTextField.setText(baseUrl);
         }
-        if (noOfEndPoints != 0){
+        if (noOfEndPoints == 0){
+            noOfEndPointsTextField.setText("");
+        }else{
             noOfEndPointsTextField.setText(String.valueOf(noOfEndPoints));
         }
         if (moduleSelected != null){
