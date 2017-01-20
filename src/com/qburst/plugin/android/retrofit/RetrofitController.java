@@ -34,6 +34,7 @@ public class RetrofitController {
     private Module moduleSelected;
     private String baseUrl;
     private int noOfEndPoints;
+    private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
 
     private JFrame frame;
 
@@ -80,6 +81,14 @@ public class RetrofitController {
 
     public void setModuleSelected(Module moduleSelected) {
         this.moduleSelected = moduleSelected;
+    }
+
+    public void setEndPointDataModel(int position, EndPointDataModel endPointDataModel) {
+        this.endPointDataModelList.set(position, endPointDataModel);
+    }
+
+    public EndPointDataModel getEndPointDataModel(int position) {
+        return this.endPointDataModelList.get(position);
     }
 
     public int getNoOfEndPoints() {

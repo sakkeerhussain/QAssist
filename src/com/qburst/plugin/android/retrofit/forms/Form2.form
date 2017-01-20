@@ -68,8 +68,18 @@
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
+                      <model>
+                        <item value="GET"/>
+                        <item value="POST"/>
+                        <item value="PUT"/>
+                        <item value="DELETE"/>
+                        <item value="PATCH"/>
+                      </model>
                       <toolTipText value="Choose API methord"/>
                     </properties>
+                    <clientProperties>
+                      <html.disable class="java.lang.Boolean" value="false"/>
+                    </clientProperties>
                   </component>
                   <component id="19980" class="javax.swing.JLabel">
                     <constraints>
@@ -91,9 +101,11 @@
                     <constraints>
                       <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="50"/>
+                        <maximum-size width="-1" height="500"/>
                       </grid>
                     </constraints>
                     <properties>
+                      <margin top="0" left="0" bottom="0" right="0"/>
                       <toolTipText value="Request Model"/>
                     </properties>
                   </component>
@@ -101,6 +113,7 @@
                     <constraints>
                       <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="50"/>
+                        <maximum-size width="-1" height="500"/>
                       </grid>
                     </constraints>
                     <properties>

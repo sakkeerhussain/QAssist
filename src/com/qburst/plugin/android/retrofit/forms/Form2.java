@@ -4,6 +4,7 @@ import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -11,6 +12,7 @@ import javax.swing.*;
 public class Form2 {
     private static final String TAG = "Form2";
     private int currentEndPoint;
+
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -57,6 +59,12 @@ public class Form2 {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        Border border = new JTextField().getBorder();
+        //form.methordChooserComboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        form.requestModelTextArea.setBorder(border);
+        form.responseModelTextArea.setBorder(border);
+
         return form;
     }
 
