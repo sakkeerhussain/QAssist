@@ -16,6 +16,10 @@ public class Form2 {
     private JPanel rootPanel;
     private JButton nextButton;
     private JButton previousButton;
+    private JTextField endPointUrlTextField;
+    private JComboBox methordChooserComboBox;
+    private JTextArea requestModelTextArea;
+    private JTextArea responseModelTextArea;
 
     private RetrofitController controller;
 
