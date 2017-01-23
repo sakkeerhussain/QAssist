@@ -1,5 +1,6 @@
 package com.qburst.plugin.android.retrofit.forms;
 
+import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
 
@@ -30,6 +31,7 @@ public class Form2 {
         /*finishButton.addActionListener(e -> {
         });*/
         previousButton.addActionListener(e -> {
+            storeData();
             if (currentEndPoint <= 1){
                 controller.openForm1();
             }else{
@@ -38,6 +40,7 @@ public class Form2 {
             }
         });
         nextButton.addActionListener(e -> {
+            storeData();
             if (currentEndPoint >= controller.getNoOfEndPoints()){
                 controller.openForm3();
             }else{
@@ -47,8 +50,25 @@ public class Form2 {
         });
     }
 
+    private void storeData() {
+        EndPointDataModel endPointData = new EndPointDataModel();
+        endPointData.setEndPointNo(currentEndPoint);
+        // TODO: 23/01/17 Should add empty validation.
+        endPointData.setEndPointUrl(endPointUrlTextField.getText());
+        endPointData.setMethod(methordChooserComboBox.getSelectedItem().toString());
+        // TODO: 23/01/17 Should add json validation.
+        endPointData.setRequestModel(requestModelTextArea.getText());
+        endPointData.setResponseModel(responseModelTextArea.getText());
+        controller.setEndPointDataModel(endPointData);
+    }
+
     private void setUpView() {
         controller.setTitle("End point "+currentEndPoint);
+        EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
+        endPointUrlTextField.setText(endPointData.getEndPointUrl());
+        methordChooserComboBox.setSelectedItem(endPointData.getMethod());
+        requestModelTextArea.setText(endPointData.getRequestModel());
+        responseModelTextArea.setText(endPointData.getResponseModel());
     }
 
     public static Form2 main(String[] args, JFrame frame) {

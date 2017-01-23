@@ -83,12 +83,26 @@ public class RetrofitController {
         this.moduleSelected = moduleSelected;
     }
 
-    public void setEndPointDataModel(int position, EndPointDataModel endPointDataModel) {
-        this.endPointDataModelList.set(position, endPointDataModel);
+    public void setEndPointDataModel(EndPointDataModel endPointDataModel) {
+        boolean alreadyExisting = false;
+        for (EndPointDataModel endPointDataModelIter : endPointDataModelList) {
+            if (endPointDataModelIter.getEndPointNo() == endPointDataModel.getEndPointNo()) {
+                alreadyExisting = true;
+                this.endPointDataModelList.set(this.endPointDataModelList.indexOf(endPointDataModelIter), endPointDataModel);
+            }
+        }
+        if (!alreadyExisting) {
+            this.endPointDataModelList.add(endPointDataModel);
+        }
     }
 
     public EndPointDataModel getEndPointDataModel(int position) {
-        return this.endPointDataModelList.get(position);
+        for (EndPointDataModel endPointDataModel : endPointDataModelList) {
+            if (endPointDataModel.getEndPointNo() == position) {
+                return endPointDataModel;
+            }
+        }
+        return new EndPointDataModel();
     }
 
     public int getNoOfEndPoints() {
@@ -97,7 +111,7 @@ public class RetrofitController {
 
     public void integrateRetrofit() {
         String message = "Integrating Retrofit to your Project...";
-        NotificationManager.get().showNotificationInfo(project, "Retrofit", "gagag", message);
+        NotificationManager.get().showNotificationInfo(project, "Retrofit", "", message);
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (moduleSelected == null) { return; }
