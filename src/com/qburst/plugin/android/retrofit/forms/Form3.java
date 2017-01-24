@@ -13,6 +13,7 @@ public class Form3 {
     private JPanel rootPanel;
     private JButton nextButton;
     private JButton previousButton;
+    private JTextPane weWillAdddRetrofitTextPane;
 
     private RetrofitController controller;
 
