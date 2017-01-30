@@ -172,8 +172,8 @@ public class RetrofitController {
             return childDir;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return childDir;
     }
 
     private VirtualFile isDirectoryExists(VirtualFile parentDir, String name){
