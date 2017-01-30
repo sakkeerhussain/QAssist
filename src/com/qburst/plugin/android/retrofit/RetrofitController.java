@@ -12,6 +12,14 @@ import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile;
+import com.intellij.openapi.vfs.newvfs.NewVirtualFileSystem;
+import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
+import com.intellij.openapi.vfs.newvfs.impl.VirtualFileSystemEntry;
+import com.intellij.psi.*;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
@@ -20,6 +28,7 @@ import com.qburst.plugin.android.utils.notification.NotificationManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +46,12 @@ public class RetrofitController {
     private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
 
     private JFrame frame;
+    private AnActionEvent event;
 
     public void integrateRetrofitAction(AnActionEvent event) {
-        project = event.getData(PlatformDataKeys.PROJECT);
-        frame = new JFrame("Retrofit");
+        this.project = event.getData(PlatformDataKeys.PROJECT);
+        this.event = event;
+        this.frame = new JFrame("Retrofit");
         openForm1();
     }
 
@@ -112,7 +123,69 @@ public class RetrofitController {
     public void integrateRetrofit() {
         String message = "Integrating Retrofit to your Project...";
         NotificationManager.get().showNotificationInfo(project, "Retrofit", "", message);
+        hideForm();
+        addDependencies();
+        createClasses();
+    }
 
+    private boolean createClasses() {
+        ModuleRootManager root = ModuleRootManager.getInstance(moduleSelected);
+        for (VirtualFile file : root.getSourceRoots(false)) {
+            System.out.println(file);
+        }
+
+        System.out.println("=====================");
+
+        NewVirtualFile file = (NewVirtualFile) root.getSourceRoots(false)[7];
+        String PACKAGE_NAME = "com.qburst.retrofit";
+        String CLASS_NAME = "RetrofitManager";
+        VirtualFile comDir = createDirectory(file, "com");
+        VirtualFile qBurstDir = createDirectory(comDir, "qburst");
+        VirtualFile retrofitDir = createDirectory(qBurstDir, "retrofit");
+        if (retrofitDir == null){
+            return false;
+        }
+
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(PACKAGE_NAME);
+        if (pkg == null){
+            return false;
+        }
+
+        for (PsiClass classObj : pkg.getClasses()){
+            System.out.println(classObj);
+        }
+        PsiDirectory psiDirectory = pkg.getDirectories()[0];
+        JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
+        return true;
+    }
+
+    private VirtualFile createDirectory(VirtualFile parentDir, String name){
+        if (parentDir == null){
+            return null;
+        }
+        VirtualFile childDir = isDirectoryExists(parentDir, name);
+        if (childDir != null){
+            return childDir;
+        }
+        try {
+            childDir = parentDir.createChildDirectory(this, name);
+            return childDir;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return childDir;
+    }
+
+    private VirtualFile isDirectoryExists(VirtualFile parentDir, String name){
+        for (VirtualFile file: parentDir.getChildren()) {
+            if (file.getName().equals(name)){
+                return file;
+            }
+        }
+        return null;
+    }
+
+    private void addDependencies() {
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (moduleSelected == null) { return; }
             //CreateClassAction f = new CreateClassAction();
