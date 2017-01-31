@@ -9,4 +9,9 @@ public class Log {
         System.out.println("\n===========Debug===============");
         System.out.println(tag+": "+s);
     }
+
+    public static void t(String tag, String s) {
+        System.out.println("\n===========Test===============");
+        System.out.println(tag+": "+s);
+    }
 }

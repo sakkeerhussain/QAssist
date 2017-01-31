@@ -12,25 +12,34 @@ import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.SourceFolder;
+import com.intellij.openapi.roots.impl.SourceFolderImpl;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.vfs.newvfs.NewVirtualFile;
-import com.intellij.openapi.vfs.newvfs.NewVirtualFileSystem;
-import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
-import com.intellij.openapi.vfs.newvfs.impl.VirtualFileSystemEntry;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
+import com.intellij.util.SmartList;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
+import groovy.lang.MetaObjectProtocol;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.jetbrains.jps.model.java.JavaResourceRootProperties;
+import org.jetbrains.jps.model.java.JavaSourceRootProperties;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
+import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -129,17 +138,10 @@ public class RetrofitController {
     }
 
     private boolean createClasses() {
-        ModuleRootManager root = ModuleRootManager.getInstance(moduleSelected);
-        for (VirtualFile file : root.getSourceRoots(false)) {
-            System.out.println(file);
-        }
-
-        System.out.println("=====================");
-
-        NewVirtualFile file = (NewVirtualFile) root.getSourceRoots(false)[7];
+        SourceFolder sourceFolder = getSourceRoots().get(0);
         String PACKAGE_NAME = "com.qburst.retrofit";
         String CLASS_NAME = "RetrofitManager";
-        VirtualFile comDir = createDirectory(file, "com");
+        VirtualFile comDir = createDirectory(sourceFolder.getFile(), "com");
         VirtualFile qBurstDir = createDirectory(comDir, "qburst");
         VirtualFile retrofitDir = createDirectory(qBurstDir, "retrofit");
         if (retrofitDir == null){
@@ -155,8 +157,34 @@ public class RetrofitController {
             System.out.println(classObj);
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
+        PsiJavaFileImpl javaFile;
+        if ((javaFile = isClassExists(psiDirectory, CLASS_NAME)) != null){
+            javaFile.delete();
+        }
         JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
         return true;
+    }
+
+
+    private List<SourceFolder> getSourceRoots() {
+        List<SourceFolder> result = new SmartList<>();
+        ModuleRootManager root = ModuleRootManager.getInstance(moduleSelected);
+        for (ContentEntry contentEntry : root.getContentEntries()) {
+            Set<? extends JpsModuleSourceRootType<?>> rootType = Collections.singleton(JavaSourceRootType.SOURCE);
+            final List<SourceFolder> sourceFolders = contentEntry.getSourceFolders(rootType);
+            for (SourceFolder sourceFolder : sourceFolders) {
+                if (sourceFolder == null) continue;
+                if (sourceFolder.getFile() == null) continue;
+                if (isForGeneratedSources((SourceFolderImpl) sourceFolder)) continue;
+                result.add(sourceFolder);
+            }
+        }
+        return result;
+    }
+
+    private boolean isForGeneratedSources(SourceFolderImpl sourceFolder) {
+        JavaSourceRootProperties properties = sourceFolder.getJpsElement().getProperties(JavaModuleSourceRootTypes.SOURCES);
+        return properties != null && properties.isForGeneratedSources();
     }
 
     private VirtualFile createDirectory(VirtualFile parentDir, String name){
@@ -180,6 +208,16 @@ public class RetrofitController {
         for (VirtualFile file: parentDir.getChildren()) {
             if (file.getName().equals(name)){
                 return file;
+            }
+        }
+        return null;
+    }
+
+    private PsiJavaFileImpl isClassExists(PsiDirectory parentDir, String name){
+        for (PsiElement file: parentDir.getChildren()) {
+            if (file.getClass() == PsiJavaFileImpl.class
+                    && ((PsiJavaFileImpl)file).getName().equals(name+".java")){
+                return (PsiJavaFileImpl) file;
             }
         }
         return null;
