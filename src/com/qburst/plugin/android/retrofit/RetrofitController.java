@@ -17,7 +17,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.SourceFolderImpl;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.NewVirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.util.SmartList;
@@ -26,10 +25,8 @@ import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
-import groovy.lang.MetaObjectProtocol;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
-import org.jetbrains.jps.model.java.JavaResourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
@@ -134,27 +131,17 @@ public class RetrofitController {
         NotificationManager.get().showNotificationInfo(project, "Retrofit", "", message);
         hideForm();
         addDependencies();
+        createPackage();
         createClasses();
     }
 
     private boolean createClasses() {
-        SourceFolder sourceFolder = getSourceRoots().get(0);
         String PACKAGE_NAME = "com.qburst.retrofit";
         String CLASS_NAME = "RetrofitManager";
-        VirtualFile comDir = createDirectory(sourceFolder.getFile(), "com");
-        VirtualFile qBurstDir = createDirectory(comDir, "qburst");
-        VirtualFile retrofitDir = createDirectory(qBurstDir, "retrofit");
-        if (retrofitDir == null){
-            return false;
-        }
 
         PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(PACKAGE_NAME);
         if (pkg == null){
             return false;
-        }
-
-        for (PsiClass classObj : pkg.getClasses()){
-            System.out.println(classObj);
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
         PsiJavaFileImpl javaFile;
@@ -163,6 +150,14 @@ public class RetrofitController {
         }
         JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
         return true;
+    }
+
+    private boolean createPackage() {
+        SourceFolder sourceFolder = getSourceRoots().get(0);
+        VirtualFile comDir = createDirectory(sourceFolder.getFile(), "com");
+        VirtualFile qBurstDir = createDirectory(comDir, "qburst");
+        VirtualFile retrofitDir = createDirectory(qBurstDir, "retrofit");
+        return retrofitDir != null;
     }
 
 

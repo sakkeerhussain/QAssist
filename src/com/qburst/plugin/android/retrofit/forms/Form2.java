@@ -3,9 +3,13 @@ package com.qburst.plugin.android.retrofit.forms;
 import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -23,6 +27,8 @@ public class Form2 {
     private JComboBox methordChooserComboBox;
     private JTextArea requestModelTextArea;
     private JTextArea responseModelTextArea;
+    private JButton formatResponseButton;
+    private JButton formatRequestButton;
 
     private RetrofitController controller;
 
@@ -48,6 +54,27 @@ public class Form2 {
                 setUpView();
             }
         });
+        formatRequestButton.addActionListener(e -> {
+            String json = requestModelTextArea.getText();
+            requestModelTextArea.setText(formatJson(json));
+        });
+        formatResponseButton.addActionListener(e -> {
+            String json = responseModelTextArea.getText();
+            responseModelTextArea.setText(formatJson(json));
+        });
+    }
+
+    private String formatJson(String json){
+        json = json.trim();
+        if (json.startsWith("{")) {
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject.toString(4);
+        } else if (json.startsWith("[")) {
+            JSONArray jsonArray = new JSONArray(json);
+            return jsonArray.toString(4);
+        }else{
+            return json;
+        }
     }
 
     private void storeData() {
@@ -78,6 +105,7 @@ public class Form2 {
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
+        frame.getRootPane().setDefaultButton(form.finishButton);
         frame.setVisible(true);
 
         Border border = new JTextField().getBorder();

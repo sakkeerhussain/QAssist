@@ -67,6 +67,7 @@ public class Form1 {
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
+        frame.getRootPane().setDefaultButton(form.finishButton);
         frame.setVisible(true);
         return form;
     }
