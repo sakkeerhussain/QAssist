@@ -7,6 +7,7 @@ import com.android.tools.idea.gradle.parser.GradleSettingsFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -58,7 +59,7 @@ public class RetrofitController {
         this.project = event.getData(PlatformDataKeys.PROJECT);
         this.event = event;
         this.frame = new JFrame("Retrofit");
-        openForm1();
+        //openForm1();
     }
 
     public void openForm1(){
@@ -148,7 +149,23 @@ public class RetrofitController {
         if ((javaFile = isClassExists(psiDirectory, CLASS_NAME)) != null){
             javaFile.delete();
         }
-        JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
+
+        Runnable runnable = () -> {
+            PsiClass managerClass = JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
+            PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+            String constFieldStr = "public static final String BASE_URL = \"" + baseUrl + "\";";
+            PsiField constField = factory.createFieldFromText(constFieldStr, managerClass);
+            managerClass.add(constField);
+        };
+        //ApplicationManager.getApplication().runWriteAction(runnable);
+        //WriteCommandAction.runWriteCommandAction(project, runnable);
+        Application application = ApplicationManager.getApplication();
+        if(application.isDispatchThread()) {
+            application.runWriteAction(runnable);
+        } else {
+            application.invokeLater(()-> application.runWriteAction(runnable));
+        }
+
         return true;
     }
 
