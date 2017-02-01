@@ -32,7 +32,6 @@ import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -127,12 +126,9 @@ public class RetrofitController {
     }
 
     public void integrateRetrofit() {
-        String message = "Integrating Retrofit to your Project...";
-        NotificationManager.get().showNotificationInfo(project, "Retrofit", "", message);
         hideForm();
         addDependencies();
         createPackage();
-        createClasses();
     }
 
     private boolean createClasses() {
@@ -141,11 +137,12 @@ public class RetrofitController {
 
         PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(PACKAGE_NAME);
         if (pkg == null){
+            NotificationManager.get().integrationFailedNotification(project);
             return false;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-        String constFieldStr = "public static final String BASE_URL = \"" + baseUrl + "\";";
+        String constFieldStr = "static final String BASE_URL = \"" + baseUrl + "\";";
         ApplicationManager.getApplication().invokeLater(() -> {
             WriteCommandAction.runWriteCommandAction(project, () -> {
                 PsiJavaFileImpl javaFile;
@@ -155,20 +152,38 @@ public class RetrofitController {
                 PsiClass managerClass = JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
                 PsiField constField = factory.createFieldFromText(constFieldStr, managerClass);
                 managerClass.add(constField);
+                PsiMethod getInstanceMethord = factory.createMethodFromText(Constants.GET_INSTANCE_METHOD, managerClass);
+                managerClass.add(getInstanceMethord);
+                NotificationManager.get().integrationCompletedNotification(project);
             });
         });
 
         return true;
     }
 
-    private boolean createPackage() {
+    private void createPackage() {
         SourceFolder sourceFolder = getSourceRoots().get(0);
-        VirtualFile comDir = createDirectory(sourceFolder.getFile(), "com");
-        VirtualFile qBurstDir = createDirectory(comDir, "qburst");
-        VirtualFile retrofitDir = createDirectory(qBurstDir, "retrofit");
-        return retrofitDir != null;
-    }
+        DirectoryManager directoryManager = DirectoryManager.get();
+        directoryManager.createDirectory(project, sourceFolder.getFile(), "com", new DirectoryManager.Listener() {
+            @Override
+            public void createdDirectorySuccessfully(VirtualFile comDir) {
 
+                directoryManager.createDirectory(project, comDir, "qburst", new DirectoryManager.Listener() {
+                    @Override
+                    public void createdDirectorySuccessfully(VirtualFile qBurstDir) {
+
+
+                        directoryManager.createDirectory(project, qBurstDir, "retrofit", new DirectoryManager.Listener() {
+                            @Override
+                            public void createdDirectorySuccessfully(VirtualFile retrofitDir) {
+                                createClasses();
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
 
     private List<SourceFolder> getSourceRoots() {
         List<SourceFolder> result = new SmartList<>();
@@ -189,32 +204,6 @@ public class RetrofitController {
     private boolean isForGeneratedSources(SourceFolderImpl sourceFolder) {
         JavaSourceRootProperties properties = sourceFolder.getJpsElement().getProperties(JavaModuleSourceRootTypes.SOURCES);
         return properties != null && properties.isForGeneratedSources();
-    }
-
-    private VirtualFile createDirectory(VirtualFile parentDir, String name){
-        if (parentDir == null){
-            return null;
-        }
-        VirtualFile childDir = isDirectoryExists(parentDir, name);
-        if (childDir != null){
-            return childDir;
-        }
-        try {
-            childDir = parentDir.createChildDirectory(this, name);
-            return childDir;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private VirtualFile isDirectoryExists(VirtualFile parentDir, String name){
-        for (VirtualFile file: parentDir.getChildren()) {
-            if (file.getName().equals(name)){
-                return file;
-            }
-        }
-        return null;
     }
 
     private PsiJavaFileImpl isClassExists(PsiDirectory parentDir, String name){
