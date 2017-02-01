@@ -305,7 +305,7 @@ public class JSONArray {
      *
      * @return The length (or size).
      */
-    int length() {
+    public int length() {
         return this.myArrayList.size();
     }
 

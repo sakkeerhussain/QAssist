@@ -44,7 +44,6 @@ import java.util.Set;
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
     private static final String COMMAND_TITLE = "Create Library";
-    private static final String COMMAND_TITLE_CREATE_MANAGER = "Create Manager Class";
 
     private Project project;
     private Module moduleSelected;
