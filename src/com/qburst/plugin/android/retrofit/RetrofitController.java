@@ -7,7 +7,6 @@ import com.android.tools.idea.gradle.parser.GradleSettingsFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -45,6 +44,7 @@ import java.util.Set;
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
     private static final String COMMAND_TITLE = "Create Library";
+    private static final String COMMAND_TITLE_CREATE_MANAGER = "Create Manager Class";
 
     private Project project;
     private Module moduleSelected;
@@ -59,7 +59,7 @@ public class RetrofitController {
         this.project = event.getData(PlatformDataKeys.PROJECT);
         this.event = event;
         this.frame = new JFrame("Retrofit");
-        //openForm1();
+        openForm1();
     }
 
     public void openForm1(){
@@ -145,26 +145,19 @@ public class RetrofitController {
             return false;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        PsiJavaFileImpl javaFile;
-        if ((javaFile = isClassExists(psiDirectory, CLASS_NAME)) != null){
-            javaFile.delete();
-        }
-
-        Runnable runnable = () -> {
-            PsiClass managerClass = JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
-            PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-            String constFieldStr = "public static final String BASE_URL = \"" + baseUrl + "\";";
-            PsiField constField = factory.createFieldFromText(constFieldStr, managerClass);
-            managerClass.add(constField);
-        };
-        //ApplicationManager.getApplication().runWriteAction(runnable);
-        //WriteCommandAction.runWriteCommandAction(project, runnable);
-        Application application = ApplicationManager.getApplication();
-        if(application.isDispatchThread()) {
-            application.runWriteAction(runnable);
-        } else {
-            application.invokeLater(()-> application.runWriteAction(runnable));
-        }
+        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+        String constFieldStr = "public static final String BASE_URL = \"" + baseUrl + "\";";
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+                PsiJavaFileImpl javaFile;
+                if ((javaFile = isClassExists(psiDirectory, CLASS_NAME)) != null) {
+                    javaFile.delete();
+                }
+                PsiClass managerClass = JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
+                PsiField constField = factory.createFieldFromText(constFieldStr, managerClass);
+                managerClass.add(constField);
+            });
+        });
 
         return true;
     }
