@@ -8,8 +8,6 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -24,11 +22,12 @@ public class Form2 {
     private JButton nextButton;
     private JButton previousButton;
     private JTextField endPointUrlTextField;
-    private JComboBox methordChooserComboBox;
+    private JComboBox methodChooserComboBox;
     private JTextArea requestModelTextArea;
     private JTextArea responseModelTextArea;
     private JButton formatResponseButton;
     private JButton formatRequestButton;
+    private JTextField endPointNameTextField;
 
     private RetrofitController controller;
 
@@ -81,8 +80,9 @@ public class Form2 {
         EndPointDataModel endPointData = new EndPointDataModel();
         endPointData.setEndPointNo(currentEndPoint);
         // TODO: 23/01/17 Should add empty validation.
+        endPointData.setEndPointName(endPointNameTextField.getText());
         endPointData.setEndPointUrl(endPointUrlTextField.getText());
-        endPointData.setMethod(methordChooserComboBox.getSelectedItem().toString());
+        endPointData.setMethod(methodChooserComboBox.getSelectedItem().toString());
         // TODO: 23/01/17 Should add json validation.
         endPointData.setRequestModel(requestModelTextArea.getText());
         endPointData.setResponseModel(responseModelTextArea.getText());
@@ -92,8 +92,9 @@ public class Form2 {
     private void setUpView() {
         controller.setTitle("End point "+currentEndPoint);
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
+        endPointNameTextField.setText(endPointData.getEndPointName());
         endPointUrlTextField.setText(endPointData.getEndPointUrl());
-        methordChooserComboBox.setSelectedItem(endPointData.getMethod());
+        methodChooserComboBox.setSelectedItem(endPointData.getMethod());
         requestModelTextArea.setText(endPointData.getRequestModel());
         responseModelTextArea.setText(endPointData.getResponseModel());
     }
@@ -109,7 +110,7 @@ public class Form2 {
         frame.setVisible(true);
 
         Border border = new JTextField().getBorder();
-        //form.methordChooserComboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        //form.methodChooserComboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         form.requestModelTextArea.setBorder(border);
         form.responseModelTextArea.setBorder(border);
 
@@ -123,5 +124,9 @@ public class Form2 {
     public void setCurrentEndPoint(int currentEndPoint) {
         this.currentEndPoint = currentEndPoint;
         setUpView();
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
