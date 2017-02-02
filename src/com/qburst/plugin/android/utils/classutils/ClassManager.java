@@ -8,6 +8,8 @@ import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+
 /**
  * Created by sakkeer on 01/02/17.
  */
@@ -67,6 +69,8 @@ public class ClassManager {
 
     public static abstract class Listener {
         public abstract void classCreatedSuccessfully(PsiClass dir);
+
+        @OverridingMethodsMustInvokeSuper
         void failedToCreateClass(Project project, String response){
             NotificationManager.get().integrationFailedNotification(project);
             Log.e(TAG, response);

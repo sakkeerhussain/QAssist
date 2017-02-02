@@ -4,7 +4,9 @@ package com.qburst.plugin.android.retrofit;
  * Created by sakkeer on 18/01/17.
  */
 public class Constants {
-    public static final String PACKAGE_NAME = "com.qburst.retrofit";
+    public static final String PACKAGE_NAME_RETROFIT = "com.qburst.retrofit";
+    public static final String PACKAGE_NAME_RETROFIT_REQUEST = "com.qburst.retrofit.model.request";
+    public static final String PACKAGE_NAME_RETROFIT_RESPONSE = "com.qburst.retrofit.model.response";
 
     public static final String DEPENDENCY_RETROFIT = "com.squareup.retrofit2:retrofit:2.1.0";
     public static final String DEPENDENCY_RETROFIT_GSON = "com.squareup.retrofit2:converter-gson:2.1.0";

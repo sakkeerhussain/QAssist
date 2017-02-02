@@ -52,11 +52,12 @@ public class RetrofitController {
     private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
 
     private JFrame frame;
-    private AnActionEvent event;
+    private int modelClassGenNumber;
+    private PsiDirectory psiDirectoryRequest;
+    private PsiDirectory psiDirectoryResponse;
 
     public void integrateRetrofitAction(AnActionEvent event) {
         this.project = event.getData(PlatformDataKeys.PROJECT);
-        this.event = event;
         this.frame = new JFrame("Retrofit");
         openForm1();
     }
@@ -132,17 +133,100 @@ public class RetrofitController {
         createPackage();
     }
 
+    private void createPackage() {
+        SourceFolder sourceFolder = getSourceRoots().get(0);
+        DirectoryManager directoryManager = DirectoryManager.get();
+        directoryManager.createDirectory(project, sourceFolder.getFile(), "com", new DirectoryManager.Listener() {
+            @Override
+            public void createdDirectorySuccessfully(VirtualFile comDir) {
+
+                directoryManager.createDirectory(project, comDir, "qburst", new DirectoryManager.Listener() {
+                    @Override
+                    public void createdDirectorySuccessfully(VirtualFile qBurstDir) {
+
+                        directoryManager.createDirectory(project, qBurstDir, "retrofit", new DirectoryManager.Listener() {
+                            @Override
+                            public void createdDirectorySuccessfully(VirtualFile retrofitDir) {
+
+                                directoryManager.createDirectory(project, retrofitDir, "model", new DirectoryManager.Listener() {
+                                    @Override
+                                    public void createdDirectorySuccessfully(VirtualFile modelDir) {
+
+                                        directoryManager.createDirectory(project, modelDir, "request", new DirectoryManager.Listener() {
+                                            @Override
+                                            public void createdDirectorySuccessfully(VirtualFile retrofitDir) {
+
+                                                directoryManager.createDirectory(project, modelDir, "response", new DirectoryManager.Listener() {
+                                                    @Override
+                                                    public void createdDirectorySuccessfully(VirtualFile retrofitDir) {
+                                                        createClasses();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     private void createClasses() {
-        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME);
+        modelClassGenNumber = 0;
+
+        //get request directory
+        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+        if (pkgRequest == null || pkgResponse == null){
+            NotificationManager.get().integrationFailedNotification(project);
+            return;
+        }
+        psiDirectoryRequest = pkgRequest.getDirectories()[0];
+        psiDirectoryResponse = pkgResponse.getDirectories()[0];
+
+        createRequestModelClasses();
+    }
+
+    private void createRequestModelClasses() {
+        ClassModel classModel = new ClassModel(project, psiDirectoryRequest, "RequstModel"+modelClassGenNumber, ClassModel.Type.CLASS);
+        classModel.addField("private String name;");
+        ClassManager.get().createClass(classModel, new ClassManager.Listener() {
+            @Override
+            public void classCreatedSuccessfully(PsiClass dir) {
+                createResponseModelClasses();
+            }
+        });
+    }
+
+    private void createResponseModelClasses() {
+        ClassModel classModel = new ClassModel(project, psiDirectoryResponse, "ResponseModel"+modelClassGenNumber, ClassModel.Type.CLASS);
+        classModel.addField("private String status;");
+        ClassManager.get().createClass(classModel, new ClassManager.Listener() {
+            @Override
+            public void classCreatedSuccessfully(PsiClass dir) {
+                if (modelClassGenNumber < noOfEndPoints) {
+                    modelClassGenNumber++;
+                    createRequestModelClasses();
+                }else{
+                    createServiceClass();
+                }
+            }
+        });
+    }
+
+    private void createServiceClass() {
+        //get retrofit directory
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT);
         if (pkg == null){
             NotificationManager.get().integrationFailedNotification(project);
             return;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        createServiceClass(psiDirectory);
-    }
 
-    private void createServiceClass(PsiDirectory psiDirectory) {
+        //Creating service class
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
         classModel.addMethod(String.format(Constants.ServiceInterface.POST, "url/", "ResponseClass", "methodName", "RequestClass", "requestObj"));
         ClassManager.get().createClass(classModel, new ClassManager.Listener() {
@@ -161,30 +245,6 @@ public class RetrofitController {
             @Override
             public void classCreatedSuccessfully(PsiClass dir) {
                 NotificationManager.get().integrationCompletedNotification(project);
-            }
-        });
-    }
-
-    private void createPackage() {
-        SourceFolder sourceFolder = getSourceRoots().get(0);
-        DirectoryManager directoryManager = DirectoryManager.get();
-        directoryManager.createDirectory(project, sourceFolder.getFile(), "com", new DirectoryManager.Listener() {
-            @Override
-            public void createdDirectorySuccessfully(VirtualFile comDir) {
-
-                directoryManager.createDirectory(project, comDir, "qburst", new DirectoryManager.Listener() {
-                    @Override
-                    public void createdDirectorySuccessfully(VirtualFile qBurstDir) {
-
-
-                        directoryManager.createDirectory(project, qBurstDir, "retrofit", new DirectoryManager.Listener() {
-                            @Override
-                            public void createdDirectorySuccessfully(VirtualFile retrofitDir) {
-                                createClasses();
-                            }
-                        });
-                    }
-                });
             }
         });
     }
