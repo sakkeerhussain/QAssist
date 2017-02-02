@@ -18,11 +18,12 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.SourceFolderImpl;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.util.SmartList;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
+import com.qburst.plugin.android.utils.classutils.ClassManager;
+import com.qburst.plugin.android.utils.classutils.ClassModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import org.jetbrains.annotations.NotNull;
@@ -131,34 +132,37 @@ public class RetrofitController {
         createPackage();
     }
 
-    private boolean createClasses() {
-        String PACKAGE_NAME = "com.qburst.retrofit";
-        String CLASS_NAME = "RetrofitManager";
-
-        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(PACKAGE_NAME);
+    private void createClasses() {
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME);
         if (pkg == null){
             NotificationManager.get().integrationFailedNotification(project);
-            return false;
+            return;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-        String constFieldStr = "static final String BASE_URL = \"" + baseUrl + "\";";
-        ApplicationManager.getApplication().invokeLater(() -> {
-            WriteCommandAction.runWriteCommandAction(project, () -> {
-                PsiJavaFileImpl javaFile;
-                if ((javaFile = isClassExists(psiDirectory, CLASS_NAME)) != null) {
-                    javaFile.delete();
-                }
-                PsiClass managerClass = JavaDirectoryService.getInstance().createClass(psiDirectory, CLASS_NAME);
-                PsiField constField = factory.createFieldFromText(constFieldStr, managerClass);
-                managerClass.add(constField);
-                PsiMethod getInstanceMethord = factory.createMethodFromText(Constants.GET_INSTANCE_METHOD, managerClass);
-                managerClass.add(getInstanceMethord);
-                NotificationManager.get().integrationCompletedNotification(project);
-            });
-        });
+        createServiceClass(psiDirectory);
+    }
 
-        return true;
+    private void createServiceClass(PsiDirectory psiDirectory) {
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
+        classModel.addMethod(String.format(Constants.ServiceInterface.POST, "url/", "ResponseClass", "methodName", "RequestClass", "requestObj"));
+        ClassManager.get().createClass(classModel, new ClassManager.Listener() {
+            @Override
+            public void classCreatedSuccessfully(PsiClass dir) {
+                createManagerClass(psiDirectory);
+            }
+        });
+    }
+
+    private void createManagerClass(PsiDirectory psiDirectory) {
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
+        classModel.addField(String.format(Constants.BASE_URL_FIELD, baseUrl));
+        classModel.addMethod(Constants.GET_INSTANCE_METHOD);
+        ClassManager.get().createClass(classModel, new ClassManager.Listener() {
+            @Override
+            public void classCreatedSuccessfully(PsiClass dir) {
+                NotificationManager.get().integrationCompletedNotification(project);
+            }
+        });
     }
 
     private void createPackage() {
@@ -206,16 +210,6 @@ public class RetrofitController {
         return properties != null && properties.isForGeneratedSources();
     }
 
-    private PsiJavaFileImpl isClassExists(PsiDirectory parentDir, String name){
-        for (PsiElement file: parentDir.getChildren()) {
-            if (file.getClass() == PsiJavaFileImpl.class
-                    && ((PsiJavaFileImpl)file).getName().equals(name+".java")){
-                return (PsiJavaFileImpl) file;
-            }
-        }
-        return null;
-    }
-
     private void addDependencies() {
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (moduleSelected == null) { return; }
@@ -244,6 +238,13 @@ public class RetrofitController {
                     Constants.DEPENDENCY_RETROFIT_GSON);
             if (!dependencies.contains(retrofitGson)) {
                 dependencies.add((retrofitGson));
+                added = true;
+            }
+            Dependency retrofitLogging = new Dependency(Dependency.Scope.COMPILE,
+                    Dependency.Type.EXTERNAL,
+                    Constants.DEPENDENCY_RETROFIT_LOGGING);
+            if (!dependencies.contains(retrofitLogging)) {
+                dependencies.add((retrofitLogging));
                 added = true;
             }
             if (added) {
