@@ -26,6 +26,7 @@ import com.qburst.plugin.android.utils.classutils.ClassManager;
 import com.qburst.plugin.android.utils.classutils.ClassModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
+import com.qburst.plugin.android.utils.string.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
@@ -191,8 +192,8 @@ public class RetrofitController {
     }
 
     private void createRequestModelClasses() {
-        ClassModel classModel = new ClassModel(project, psiDirectoryRequest, "RequstModel"+modelClassGenNumber, ClassModel.Type.CLASS);
-        classModel.addField("private String name;");
+        ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModelList.get(modelClassGenNumber),
+                project, psiDirectoryRequest);
         ClassManager.get().createClass(classModel, new ClassManager.Listener() {
             @Override
             public void classCreatedSuccessfully(PsiClass dir) {
@@ -202,12 +203,12 @@ public class RetrofitController {
     }
 
     private void createResponseModelClasses() {
-        ClassModel classModel = new ClassModel(project, psiDirectoryResponse, "ResponseModel"+modelClassGenNumber, ClassModel.Type.CLASS);
-        classModel.addField("private String status;");
+        ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModelList.get(modelClassGenNumber),
+                project, psiDirectoryResponse);
         ClassManager.get().createClass(classModel, new ClassManager.Listener() {
             @Override
             public void classCreatedSuccessfully(PsiClass dir) {
-                if (modelClassGenNumber < noOfEndPoints) {
+                if (modelClassGenNumber < (noOfEndPoints-1)) {
                     modelClassGenNumber++;
                     createRequestModelClasses();
                 }else{
@@ -228,7 +229,17 @@ public class RetrofitController {
 
         //Creating service class
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
-        classModel.addMethod(String.format(Constants.ServiceInterface.POST, "url/", "ResponseClass", "methodName", "RequestClass", "requestObj"));
+        for (int i = 0; i < noOfEndPoints; i++) {
+            EndPointDataModel endPointData = endPointDataModelList.get(i);
+            String methodString = String.format(Constants.ServiceInterface.POST,
+                    endPointData.getEndPointUrl(),
+                    endPointData.getResponseModelClassName(),
+                    endPointData.getEndPointName(),
+                    endPointData.getRequestModelClassName(),
+                    new StringUtils().lowersFirstLetter(endPointData.getSimpleRequestModelClassName()));
+            classModel.addMethod(methodString);
+        }
+
         ClassManager.get().createClass(classModel, new ClassManager.Listener() {
             @Override
             public void classCreatedSuccessfully(PsiClass dir) {

@@ -5,6 +5,13 @@ package com.qburst.plugin.android.utils.string;
  */
 public class StringUtils {
 
+    public String lowersFirstLetter(String str){
+        if (str.length()<1){
+            return str;
+        }
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
     public String capitaliseFirstLetter(String str){
         if (str.length()<1){
             return str;

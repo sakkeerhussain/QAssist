@@ -4,6 +4,9 @@ package com.qburst.plugin.android.retrofit;
  * Created by sakkeer on 18/01/17.
  */
 public class Constants {
+    public static final String STRING_REQUEST_MODEL = "RequestModel";
+    public static final String STRING_RESPONSE_MODEL = "ResponseModel";
+
     public static final String PACKAGE_NAME_RETROFIT = "com.qburst.retrofit";
     public static final String PACKAGE_NAME_RETROFIT_REQUEST = "com.qburst.retrofit.model.request";
     public static final String PACKAGE_NAME_RETROFIT_RESPONSE = "com.qburst.retrofit.model.response";
@@ -47,7 +50,7 @@ public class Constants {
             "    }";
 
     public class ServiceInterface {
-        public static final String POST = "@retrofit2.http.POST(\"%s/\")\n" +
+        public static final String POST = "@retrofit2.http.POST(\"%s\")\n" +
                 "    retrofit2.Call<%s> %s(@retrofit2.http.Body %s %s);";
     }
 
