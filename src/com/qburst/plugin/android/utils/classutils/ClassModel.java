@@ -3,6 +3,7 @@ package com.qburst.plugin.android.utils.classutils;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class ClassModel {
     private PsiClass psiClass;
     private Project project;
     private String name;
-    private List<PsiField> fields;
+    private List<FieldModel> fields;
     private List<PsiMethod> methods;
 
     //constructor
@@ -33,13 +34,37 @@ public class ClassModel {
     public void addField(String fieldStr){
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(this.project);
         PsiField field = factory.createFieldFromText(fieldStr, directory);
-        this.fields.add(field);
+        FieldModel fieldModel = new FieldModel();
+        fieldModel.setPsiField(field);
+        this.fields.add(fieldModel);
     }
 
     public void addMethod(String methodString){
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(this.project);
         PsiMethod method = factory.createMethodFromText(methodString, directory);
         this.methods.add(method);
+    }
+
+    public boolean isSame(JSONObject o) {
+        if (o == null) {
+            return false;
+        }
+        boolean same = true;
+        for (String key : o.keySet()) {
+            same = false;
+            for (FieldModel field : fields) {
+                if (field.getKey().equals(key)) {
+                    if (field.isSameType(o.get(key))) {
+                        same = true;
+                    }
+                    break;
+                }
+            }
+            if (!same) {
+                break;
+            }
+        }
+        return same;
     }
 
     //setters
@@ -60,7 +85,7 @@ public class ClassModel {
         return name;
     }
 
-    public List<PsiField> getFields() {
+    public List<FieldModel> getFields() {
         return fields;
     }
 

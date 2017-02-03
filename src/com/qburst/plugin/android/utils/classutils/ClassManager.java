@@ -42,8 +42,8 @@ public class ClassManager {
                             classModel.getName());
                 }
                 classModel.setPsiClass(classObj);
-                for (PsiField field:classModel.getFields()) {
-                    classModel.getPsiClass().add(field);
+                for (FieldModel field:classModel.getFields()) {
+                    classModel.getPsiClass().add(field.getPsiField());
                 }
                 for (PsiMethod method:classModel.getMethods()) {
                     classModel.getPsiClass().add(method);
