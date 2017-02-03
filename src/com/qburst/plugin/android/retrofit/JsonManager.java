@@ -22,6 +22,11 @@ public class JsonManager {
     private HashMap<String, FieldModel> declareFields;
     private HashMap<String, ClassModel> declareClass;
 
+    public JsonManager() {
+        this.declareFields = new HashMap<>();
+        this.declareFields = new HashMap<>();
+    }
+
     public ClassModel getRequestClassModel(EndPointDataModel endPointDataModel, @NotNull Project project, @NotNull PsiDirectory directory) {
         String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_REQUEST_MODEL});
         endPointDataModel.setRequestModelClassName(name);
