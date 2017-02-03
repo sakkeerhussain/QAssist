@@ -4,10 +4,13 @@ import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+
+import static java.lang.Character.isDigit;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -28,6 +31,7 @@ public class Form2 {
     private JButton formatResponseButton;
     private JButton formatRequestButton;
     private JTextField endPointNameTextField;
+    private JLabel errorLabel;
 
     private RetrofitController controller;
 
@@ -45,6 +49,9 @@ public class Form2 {
             }
         });
         nextButton.addActionListener(e -> {
+            if (!validData()){
+                return;
+            }
             storeData();
             if (currentEndPoint >= controller.getNoOfEndPoints()){
                 controller.openForm3();
@@ -61,6 +68,61 @@ public class Form2 {
             String json = responseModelTextArea.getText();
             responseModelTextArea.setText(formatJson(json));
         });
+    }
+
+    private boolean validData() {
+        errorLabel.setText("");
+        if(endPointNameTextField.getText().isEmpty())
+        {
+            errorLabel.setText("End point Name is empty");
+            return false;
+        }
+       if(endPointUrlTextField.getText().isEmpty())
+       {
+           errorLabel.setText("End point URL is empty");
+           return false;
+       }
+       if(requestModelTextArea.getText().isEmpty())
+       {
+           errorLabel.setText("Request model is empty");
+           return false;
+       }
+        if(responseModelTextArea.getText().isEmpty())
+        {
+            errorLabel.setText("Response model is empty");
+            return false;
+        }
+
+        if(isDigit(endPointNameTextField.getText().charAt(0)))
+        {
+           errorLabel.setText("End point name starts with digit");
+            return false;
+        }
+        if(isDigit(endPointUrlTextField.getText().charAt(0)))
+        {
+            errorLabel.setText("End point URL starts with digit");
+            return false;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(requestModelTextArea.getText());
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            errorLabel.setText("Request model is not a valid JSON");
+            return false;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(responseModelTextArea.getText());
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            errorLabel.setText("Response model is not a valid JSON");
+            return false;
+        }
+                return  true;
+
     }
 
     private String formatJson(String json){
