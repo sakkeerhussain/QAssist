@@ -29,4 +29,8 @@ public class StringUtils {
         }
         return result;
     }
+
+    public String getValueAsString(String str){
+        return "\""+str+"\"";
+    }
 }

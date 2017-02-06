@@ -12,31 +12,49 @@ import java.util.List;
  * Created by sakkeer on 02/02/17.
  */
 public class ClassModel {
+
     private Type type;
-    private PsiDirectory directory;
-    private PsiClass psiClass;
-    private Project project;
     private String name;
+    private Project project;
+    private PsiClass psiClass;
+    private PsiPackage packageObj;
+    private PsiDirectory directory;
     private List<FieldModel> fields;
     private List<PsiMethod> methods;
+    private List<ClassModel> subClasses;
 
     //constructor
-    public ClassModel(@NotNull Project project, @NotNull PsiDirectory directory, @NotNull String name, @NotNull Type type) {
+    public ClassModel(@NotNull Project project,
+                      @NotNull PsiDirectory directory,
+                      @NotNull String name,
+                      @NotNull Type type) {
+
         this.type = type;
         this.project = project;
         this.directory = directory;
         this.name = name;
         this.fields = new ArrayList<>();
         this.methods = new ArrayList<>();
+        this.subClasses = new ArrayList<>();
+    }
+
+    public ClassModel(@NotNull ClassModel classModel,
+                      @NotNull String name,
+                      @NotNull Type type) {
+        this(classModel.project, classModel.directory, name, type);
     }
 
     //methods
-    public void addField(String fieldStr){
-        PsiElementFactory factory = JavaPsiFacade.getElementFactory(this.project);
-        PsiField field = factory.createFieldFromText(fieldStr, directory);
-        FieldModel fieldModel = new FieldModel();
-        fieldModel.setPsiField(field);
-        this.fields.add(fieldModel);
+    public void addAllFields(List<FieldModel> fieldModelList){
+        this.fields.addAll(fieldModelList);
+    }
+
+    public void addInnerClass(ClassModel classModel){
+        this.subClasses.add(classModel);
+    }
+
+    public void addField(FieldModel field) {
+        this.fields.add(field);
     }
 
     public void addMethod(String methodString){
@@ -81,6 +99,10 @@ public class ClassModel {
     }
 
     //getters
+    public String getFullName() {
+        // TODO: 06/02/17 return package name toooo
+        return name;
+    }
     public String getName() {
         return name;
     }

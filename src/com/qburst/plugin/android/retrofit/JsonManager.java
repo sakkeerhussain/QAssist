@@ -3,16 +3,16 @@ package com.qburst.plugin.android.retrofit;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.qburst.plugin.android.utils.classutils.ClassModel;
+import com.qburst.plugin.android.utils.classutils.DataType;
 import com.qburst.plugin.android.utils.classutils.FieldModel;
+import com.qburst.plugin.android.utils.classutils.IterableFieldModel;
 import com.qburst.plugin.android.utils.string.StringUtils;
+import org.apache.http.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by sakkeer on 02/02/17.
@@ -24,15 +24,14 @@ public class JsonManager {
 
     public JsonManager() {
         this.declareFields = new HashMap<>();
-        this.declareFields = new HashMap<>();
+        this.declareClass = new HashMap<>();
     }
 
     public ClassModel getRequestClassModel(EndPointDataModel endPointDataModel, @NotNull Project project, @NotNull PsiDirectory directory) {
         String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_REQUEST_MODEL});
         endPointDataModel.setRequestModelClassName(name);
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
-        parseJson(endPointDataModel.getRequestModel());
-        classModel.addField("private String requstField;");
+        parseJson(endPointDataModel.getRequestModel(), classModel);
         return classModel;
     }
 
@@ -40,13 +39,15 @@ public class JsonManager {
         String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_RESPONSE_MODEL});
         endPointDataModel.setResponseModelClassName(name);
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
-        classModel.addField("private String responseField;");
+        parseJson(endPointDataModel.getResponseModel(), classModel);
         return classModel;
     }
 
-    private void parseJson(String json) {
+    private void parseJson(String json, ClassModel classModel) {
         JSONObject jsonObj = parseJSONObject(json);
         List<String> generateFiled = collectGenerateFiled(jsonObj);
+        List<FieldModel> createdFields = createFields(jsonObj, generateFiled, classModel);
+        classModel.addAllFields(createdFields);
     }
 
     private JSONObject parseJSONObject(String jsonStr) {
@@ -100,16 +101,187 @@ public class JsonManager {
         return fieldModel.isSameType(json.get(key));
     }
 
-    private String formatJson(String json){
-        json = json.trim();
-        if (json.startsWith("{")) {
-            JSONObject jsonObject = new JSONObject(json);
-            return jsonObject.toString(4);
-        } else if (json.startsWith("[")) {
-            JSONArray jsonArray = new JSONArray(json);
-            return jsonArray.toString(4);
-        }else{
-            return json;
+    private List<FieldModel> createFields(JSONObject json, List<String> fieldList, ClassModel parentClass) {
+        List<FieldModel> fieldModelList = new ArrayList<>();
+        List<String> listEntityList = new ArrayList<String>();
+
+        for (String key : fieldList) {
+            Object value = json.get(key);
+            if (value instanceof JSONArray) {
+                listEntityList.add(key);
+                continue;
+            }
+            FieldModel fieldModel = createField(parentClass, key, value);
+            fieldModelList.add(fieldModel);
+        }
+
+        for (String key : listEntityList) {
+            Object type = json.get(key);
+            FieldModel fieldModel = createField(parentClass, key, type);
+            fieldModelList.add(fieldModel);
+        }
+
+        return fieldModelList;
+    }
+
+    private FieldModel createField(ClassModel parentClass, String key, Object type) {
+        String fieldName = key;
+        fieldName = handleDeclareFieldName(fieldName, "");
+
+        FieldModel fieldModel = typeByValue(parentClass, key, type);
+        fieldModel.setFieldName(fieldName);
+        return fieldModel;
+    }
+
+    private FieldModel typeByValue(ClassModel parentClass, String key, Object type) {
+        FieldModel result;
+        if (type instanceof JSONObject) {
+            ClassModel classModel = existDeclareClass((JSONObject) type);
+            if (classModel == null) {
+                FieldModel fieldModel = new FieldModel(parentClass);
+                ClassModel innerClassModel = createInnerClass(createSubClassName(key, type), (JSONObject) type, parentClass);
+                fieldModel.setKey(key);
+                fieldModel.setType(innerClassModel.getName());
+                fieldModel.setTargetClass(innerClassModel);
+                result = fieldModel;
+            } else {
+                FieldModel fieldModel = new FieldModel(parentClass);
+                fieldModel.setKey(key);
+                fieldModel.setTargetClass(parentClass);
+                result = fieldModel;
+            }
+        } else if (type instanceof JSONArray) {
+            result = handleJSONArray(parentClass, (JSONArray) type, key, 1);
+        } else {
+            FieldModel fieldModel = new FieldModel(parentClass);
+            fieldModel.setKey(key);
+            fieldModel.setType(DataType.typeOfObject(type).getValue());
+            result = fieldModel;
+            if (type != null) {
+                result.setComment(type.toString());
+            }
+        }
+        result.setKey(key);
+        return result;
+    }
+
+    private FieldModel handleJSONArray(ClassModel parentClass, JSONArray jsonArray, String key, int deep) {
+
+        FieldModel fieldModel;
+        if (jsonArray.length() > 0) {
+            Object item = jsonArray.get(0);
+            if (item instanceof JSONObject) {
+                item = getJsonObject(jsonArray);
+            }
+            fieldModel = listTypeByValue(parentClass, key, item, deep);
+        } else {
+            fieldModel = new IterableFieldModel(parentClass);
+            fieldModel.setKey(key);
+            fieldModel.setType("?");
+            ((IterableFieldModel) fieldModel).setDeep(deep);
+        }
+        return fieldModel;
+    }
+
+    private FieldModel listTypeByValue(ClassModel parentClass, String key, Object type, int deep) {
+
+        FieldModel item;
+        if (type instanceof JSONObject) {
+            ClassModel classModel = existDeclareClass((JSONObject) type);
+            if (classModel == null) {
+                IterableFieldModel iterableFieldModel = new IterableFieldModel(parentClass);
+                ClassModel innerClassModel = createInnerClass(createSubClassName(key, type), (JSONObject) type, parentClass);
+                iterableFieldModel.setDeep(deep);
+                iterableFieldModel.setTargetClass(innerClassModel);
+                item = iterableFieldModel;
+            } else {
+                IterableFieldModel fieldModel = new IterableFieldModel(parentClass);
+                fieldModel.setTargetClass(classModel);
+                fieldModel.setType(classModel.getName());
+                fieldModel.setDeep(deep);
+                item = fieldModel;
+            }
+
+        } else if (type instanceof JSONArray) {
+            FieldModel fieldModel = handleJSONArray(parentClass, (JSONArray) type, key, ++deep);
+            fieldModel.setKey(key);
+            item = fieldModel;
+        } else {
+            IterableFieldModel fieldModel = new IterableFieldModel(parentClass);
+            fieldModel.setKey(key);
+            fieldModel.setType(type.getClass().getSimpleName());
+            fieldModel.setDeep(deep);
+            item = fieldModel;
+        }
+        return item;
+    }
+
+    private ClassModel existDeclareClass(JSONObject jsonObject) {
+        for (ClassModel classModel : declareClass.values()) {
+            Iterator<String> keys = jsonObject.keys();
+            boolean had = false;
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = jsonObject.get(key);
+                had = false;
+                for (FieldModel fieldModel : classModel.getFields()) {
+                    if (fieldModel.getKey().equals(key) && DataType.isSameDataType(DataType.typeOfString(fieldModel.getType()), DataType.typeOfObject(value))) {
+                        had = true;
+                        break;
+                    }
+                }
+                if (!had) {
+                    break;
+                }
+            }
+            if (had) {
+                return classModel;
+            }
+        }
+        return null;
+    }
+
+    private ClassModel createInnerClass(String className, JSONObject json, ClassModel parentClass) {
+
+        ClassModel subClassModel = new ClassModel(parentClass, className, ClassModel.Type.CLASS);
+
+        Set<String> set = json.keySet();
+        List<String> list = new ArrayList<String>(set);
+        List<FieldModel> fields = createFields(json, list, subClassModel);
+        subClassModel.addAllFields(fields);
+        handleDeclareClassName(subClassModel, "");
+        parentClass.addInnerClass(subClassModel);
+
+        return subClassModel;
+    }
+
+    private String createSubClassName(String key, Object o) {
+        String name = "";
+        if (o instanceof JSONObject) {
+            if (TextUtils.isEmpty(key)) {
+                return key;
+            }
+            String[] strings = key.split("_");
+            name = new StringUtils().capitaliseFirstLetter(strings);
+        }
+        return name;
+
+    }
+
+    private String handleDeclareFieldName(String fieldName, String appendName) {
+        fieldName += appendName;
+        // TODO: 06/02/17 check whether the field name already exists or not.
+        if (false) {
+            return handleDeclareFieldName(fieldName, "X");
+        }
+        return fieldName;
+    }
+
+    private void handleDeclareClassName(ClassModel className, String appendName) {
+        className.setName(className.getName() + appendName);
+        // TODO: 06/02/17 check whether the field name already exists or not.
+        if (false) {
+            handleDeclareClassName(className, "X");
         }
     }
 }

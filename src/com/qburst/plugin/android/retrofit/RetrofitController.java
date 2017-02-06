@@ -24,6 +24,7 @@ import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
 import com.qburst.plugin.android.utils.classutils.ClassManager;
 import com.qburst.plugin.android.utils.classutils.ClassModel;
+import com.qburst.plugin.android.utils.classutils.FieldModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import com.qburst.plugin.android.utils.string.StringUtils;
@@ -250,7 +251,10 @@ public class RetrofitController {
 
     private void createManagerClass(PsiDirectory psiDirectory) {
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
-        classModel.addField(String.format(Constants.BASE_URL_FIELD, baseUrl));
+        FieldModel staticField = new FieldModel(classModel, "private", true, true,
+                "String", "BASE_URL");
+        staticField.setValue(new StringUtils().getValueAsString(baseUrl));
+        classModel.addField(staticField);
         classModel.addMethod(Constants.GET_INSTANCE_METHOD);
         ClassManager.get().createClass(classModel, new ClassManager.Listener() {
             @Override
