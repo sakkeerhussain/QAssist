@@ -23,6 +23,7 @@ public class Form1 {
     private JTextField noOfEndPointsTextField;
     private JButton nextButton;
     private JComboBox modulesList;
+    private JLabel errorLabel;
 
     private RetrofitController controller;
     private Project project;
@@ -39,8 +40,7 @@ public class Form1 {
                 URLConnection conn = url.openConnection();
                 conn.connect();
             } catch (MalformedURLException exp) {
-                Messages.showMessageDialog(project, "Invalid base URL provided.",
-                        "Exception", Messages.getInformationIcon());
+                errorLabel.setText("Invalid base URL provided.");
                 return;
             } catch (IOException e1) {}
 
@@ -49,8 +49,7 @@ public class Form1 {
             try {
                 noOfEndPoints = Integer.parseInt(noOfEndPointsString);
             }catch (Exception exception){
-                Messages.showMessageDialog(project, "Invalid number provided for no. of end points.",
-                        "Exception", Messages.getInformationIcon());
+                errorLabel.setText("Invalid number provided for no. of end points.");
                 return;
             }
 
