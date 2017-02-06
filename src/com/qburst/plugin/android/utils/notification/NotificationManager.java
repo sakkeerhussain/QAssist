@@ -46,9 +46,10 @@ public class NotificationManager {
         showNotificationInfo(project, "Retrofit", "", message);
     }
 
-    public void integrationFailedNotification(Project project){
-        String message = "Retrofit integration to your project failed," +
-                " Please try agin or contact us in below email sakkeer@qburst.com";
-        showNotificationError(project, "Retrofit", "", message);
+    public void integrationFailedNotification(Project project, String errorMessage){
+        String title = "Retrofit integration to your project failed";
+        String message = errorMessage +
+                " Please try agin or contact us in below email sakkeer@qburst.com for support";
+        showNotificationError(project, "Retrofit", title, message);
     }
 }

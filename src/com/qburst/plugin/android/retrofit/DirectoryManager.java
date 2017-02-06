@@ -24,25 +24,20 @@ public class DirectoryManager {
         return instance;
     }
 
-    public void createDirectory(Project project, VirtualFile parentDir, String name, Listener listener){
-        if (parentDir == null){
-            listener.failedToCreateDirectory(project, "Parent dir is empty");
-            return;
+    public VirtualFile createDirectory(VirtualFile parentDir, String name) {
+        if (parentDir == null) {
+            return null;
         }
         VirtualFile childDir = isDirectoryExists(parentDir, name);
-        if (childDir != null){
-            listener.createdDirectorySuccessfully(childDir);
-            return;
+        if (childDir != null) {
+            return childDir;
         }
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-                try {
-                    VirtualFile createdDir = parentDir.createChildDirectory(this, name);
-                    listener.createdDirectorySuccessfully(createdDir);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    listener.failedToCreateDirectory(project, e.getLocalizedMessage());
-                }
-            });
+        try {
+            return parentDir.createChildDirectory(this, name);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private VirtualFile isDirectoryExists(VirtualFile parentDir, String name){
@@ -52,13 +47,5 @@ public class DirectoryManager {
             }
         }
         return null;
-    }
-
-    static abstract class Listener {
-        abstract void createdDirectorySuccessfully(VirtualFile dir);
-        void failedToCreateDirectory(Project project, String response){
-            NotificationManager.get().integrationFailedNotification(project);
-            Log.e(TAG, response);
-        }
     }
 }

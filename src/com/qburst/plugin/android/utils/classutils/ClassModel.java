@@ -85,6 +85,22 @@ public class ClassModel {
         return same;
     }
 
+    public PsiClass getPsiClassFromText(PsiClass parentClass) {
+        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+        String classStr = generateClassText();
+        return factory.createClassFromText(classStr, parentClass);
+    }
+
+    private String generateClassText() {
+        StringBuilder fieldSb = new StringBuilder();
+        fieldSb.append("public ");
+        fieldSb.append("static ");
+        fieldSb.append("class ");
+        fieldSb.append(name).append(" ");
+        fieldSb.append("{}");
+        return fieldSb.toString();
+    }
+
     //setters
     public void setName(String name){
         this.name = name;
@@ -113,6 +129,10 @@ public class ClassModel {
 
     public List<PsiMethod> getMethods() {
         return methods;
+    }
+
+    public List<ClassModel> getSubClasses() {
+        return subClasses;
     }
 
     public PsiClass getPsiClass() {
