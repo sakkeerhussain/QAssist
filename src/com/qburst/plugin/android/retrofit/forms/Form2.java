@@ -93,13 +93,10 @@ public class Form2 {
                 validData();
             }
         };
-
         endPointUrlTextField.getDocument().addDocumentListener(documentListener);
         endPointNameTextField.getDocument().addDocumentListener(documentListener);
         requestModelTextArea.getDocument().addDocumentListener(documentListener);
         responseModelTextArea.getDocument().addDocumentListener(documentListener);
-
-
     }
 
 
@@ -136,7 +133,6 @@ public class Form2 {
             return false;
         }
         if (requestModelTextArea.getText().isEmpty()) {
-
             errorLabel.setText("Request model is empty");
             return false;
         }
@@ -162,7 +158,7 @@ public class Form2 {
             return false;
         }
         errorLabel.setText("");
-        return false;
+        return true;
 
     }
 
