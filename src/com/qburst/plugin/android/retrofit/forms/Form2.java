@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import static java.lang.Character.isDigit;
 
@@ -32,30 +34,34 @@ public class Form2 {
     private JButton formatRequestButton;
     private JTextField endPointNameTextField;
     private JLabel errorLabel;
+    private Boolean flag;
 
     private RetrofitController controller;
 
     private Form2() {
+
         cancelButton.addActionListener(e -> controller.hideForm());
         /*finishButton.addActionListener(e -> {
         });*/
         previousButton.addActionListener(e -> {
+            flag = true;
             storeData();
-            if (currentEndPoint <= 1){
+            if (currentEndPoint <= 1) {
                 controller.openForm1();
-            }else{
+            } else {
                 currentEndPoint--;
                 setUpView();
             }
         });
         nextButton.addActionListener(e -> {
-            if (!validData()){
+            flag = true;
+            if (!validData()) {
                 return;
             }
             storeData();
-            if (currentEndPoint >= controller.getNoOfEndPoints()){
+            if (currentEndPoint >= controller.getNoOfEndPoints()) {
                 controller.openForm3();
-            }else{
+            } else {
                 currentEndPoint++;
                 setUpView();
             }
@@ -68,64 +74,99 @@ public class Form2 {
             String json = responseModelTextArea.getText();
             responseModelTextArea.setText(formatJson(json));
         });
+        DocumentListener documentListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if(flag)
+                validData();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                if(flag)
+                validData();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                if(flag)
+                validData();
+            }
+        };
+
+        endPointUrlTextField.getDocument().addDocumentListener(documentListener);
+        endPointNameTextField.getDocument().addDocumentListener(documentListener);
+        requestModelTextArea.getDocument().addDocumentListener(documentListener);
+        responseModelTextArea.getDocument().addDocumentListener(documentListener);
+
+
     }
 
+
+
     private boolean validData() {
-        errorLabel.setText("");
-        if(endPointNameTextField.getText().isEmpty())
-        {
+
+        if (endPointNameTextField.getText().isEmpty()) {
+
             errorLabel.setText("End point Name is empty");
             return false;
         }
-       if(endPointUrlTextField.getText().isEmpty())
-       {
-           errorLabel.setText("End point URL is empty");
-           return false;
-       }
-       if(requestModelTextArea.getText().isEmpty())
-       {
-           errorLabel.setText("Request model is empty");
-           return false;
-       }
-        if(responseModelTextArea.getText().isEmpty())
-        {
-            errorLabel.setText("Response model is empty");
+        if (isDigit(endPointNameTextField.getText().charAt(0))) {
+            errorLabel.setText("End point name starts with digit");
             return false;
         }
+        if(!endPointNameTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9]*"))
+        {
+            errorLabel.setText("End point name is not in valid format");
+            return false;
+        }
+        if (endPointUrlTextField.getText().isEmpty()) {
 
-        if(isDigit(endPointNameTextField.getText().charAt(0)))
-        {
-           errorLabel.setText("End point name starts with digit");
+            errorLabel.setText("End point URL is empty");
             return false;
         }
-        if(isDigit(endPointUrlTextField.getText().charAt(0)))
-        {
+        if (isDigit(endPointUrlTextField.getText().charAt(0))) {
+
             errorLabel.setText("End point URL starts with digit");
+            return false;
+        }
+        if(!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9]*"))
+        {
+            errorLabel.setText("End point URL is not in valid format");
+            return false;
+        }
+        if (requestModelTextArea.getText().isEmpty()) {
+
+            errorLabel.setText("Request model is empty");
             return false;
         }
         try {
             JSONObject jsonObject = new JSONObject(requestModelTextArea.getText());
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
             errorLabel.setText("Request model is not a valid JSON");
             return false;
         }
+
+        if (responseModelTextArea.getText().isEmpty()) {
+
+            errorLabel.setText("Response model is empty");
+            return false;
+        }
         try {
             JSONObject jsonObject = new JSONObject(responseModelTextArea.getText());
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
+
             errorLabel.setText("Response model is not a valid JSON");
             return false;
         }
-                return  true;
+        errorLabel.setText("");
+        return false;
 
     }
 
-    private String formatJson(String json){
+    private String formatJson(String json) {
         json = json.trim();
         if (json.startsWith("{")) {
             JSONObject jsonObject = new JSONObject(json);
@@ -133,7 +174,7 @@ public class Form2 {
         } else if (json.startsWith("[")) {
             JSONArray jsonArray = new JSONArray(json);
             return jsonArray.toString(4);
-        }else{
+        } else {
             return json;
         }
     }
@@ -152,7 +193,8 @@ public class Form2 {
     }
 
     private void setUpView() {
-        controller.setTitle("End point "+currentEndPoint);
+        flag = false;
+        controller.setTitle("End point " + currentEndPoint);
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
         endPointNameTextField.setText(endPointData.getEndPointName());
         endPointUrlTextField.setText(endPointData.getEndPointUrl());
@@ -162,7 +204,7 @@ public class Form2 {
     }
 
     public static Form2 main(String[] args, JFrame frame) {
-        Log.d(TAG,"Creating new form 2....");
+        Log.d(TAG, "Creating new form 2....");
         Form2 form = new Form2();
         frame.setContentPane(form.rootPanel);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -179,7 +221,7 @@ public class Form2 {
         return form;
     }
 
-    public void setData(RetrofitController controller){
+    public void setData(RetrofitController controller) {
         this.controller = controller;
     }
 
