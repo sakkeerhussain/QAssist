@@ -11,7 +11,6 @@ import com.qburst.plugin.android.utils.notification.NotificationManager;
  * Created by sakkeer on 01/02/17.
  */
 public class ClassManager {
-    private static final String TAG = "ClassManager";
     private static ClassManager instance;
 
     private ClassManager() {}
