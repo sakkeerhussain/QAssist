@@ -4,6 +4,7 @@ package com.qburst.plugin.android.retrofit;
  * Created by sakkeer on 18/01/17.
  */
 public class Constants {
+    public static final String STRING_MODEL = "Model";
     public static final String STRING_REQUEST_MODEL = "RequestModel";
     public static final String STRING_RESPONSE_MODEL = "ResponseModel";
 

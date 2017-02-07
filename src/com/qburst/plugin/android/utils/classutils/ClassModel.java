@@ -2,6 +2,7 @@ package com.qburst.plugin.android.utils.classutils;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import org.apache.http.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -17,6 +18,7 @@ public class ClassModel {
     private String name;
     private Project project;
     private PsiClass psiClass;
+    private String packageName;
     private PsiPackage packageObj;
     private PsiDirectory directory;
     private List<FieldModel> fields;
@@ -101,6 +103,17 @@ public class ClassModel {
         return fieldSb.toString();
     }
 
+    public String getQualifiedName() {
+        String fullClassName;
+        if (!TextUtils.isEmpty(packageName)) {
+            fullClassName = packageName + "." + name;
+        } else {
+            fullClassName = name;
+        }
+
+        return fullClassName;
+    }
+
     //setters
     public void setName(String name){
         this.name = name;
@@ -112,6 +125,10 @@ public class ClassModel {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     //getters
@@ -149,6 +166,10 @@ public class ClassModel {
 
     public Type getType() {
         return type;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     public enum Type{

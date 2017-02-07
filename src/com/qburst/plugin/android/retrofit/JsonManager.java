@@ -249,6 +249,10 @@ public class JsonManager {
         List<String> list = new ArrayList<String>(set);
         List<FieldModel> fields = createFields(json, list, subClassModel);
         subClassModel.addAllFields(fields);
+
+        subClassModel.setPackageName(parentClass.getQualifiedName());
+        subClassModel.setName(className);
+
         handleDeclareClassName(subClassModel, "");
         parentClass.addInnerClass(subClassModel);
 
@@ -264,7 +268,7 @@ public class JsonManager {
             String[] strings = key.split("_");
             name = new StringUtils().capitaliseFirstLetter(strings);
         }
-        return name;
+        return name+Constants.STRING_MODEL;
 
     }
 
