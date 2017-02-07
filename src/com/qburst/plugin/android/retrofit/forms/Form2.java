@@ -12,6 +12,9 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import static java.lang.Character.isDigit;
 
 /**
@@ -34,6 +37,7 @@ public class Form2 {
     private JButton formatRequestButton;
     private JTextField endPointNameTextField;
     private JLabel errorLabel;
+    private JLabel requestModelLabel;
     private Boolean flag;
 
     private RetrofitController controller;
@@ -97,9 +101,35 @@ public class Form2 {
         endPointNameTextField.getDocument().addDocumentListener(documentListener);
         requestModelTextArea.getDocument().addDocumentListener(documentListener);
         responseModelTextArea.getDocument().addDocumentListener(documentListener);
+        methodChooserComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(methodChooserComboBox.getSelectedItem().toString().equals("GET"))
+                {
+                    hideRequestField();
+                }
+                else
+                {
+                    showRequestField();
+                }
+            }
+
+            private void showRequestField() {
+                requestModelTextArea.setVisible(true);
+                requestModelLabel.setVisible(true);
+                formatRequestButton.setVisible(true);
+            }
+
+
+            private void hideRequestField() {
+                if(flag)
+                validData();
+                requestModelTextArea.setVisible(false);
+                requestModelLabel.setVisible(false);
+                formatRequestButton.setVisible(false);
+            }
+        });
     }
-
-
 
     private boolean validData() {
 
@@ -127,21 +157,22 @@ public class Form2 {
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
-        if(!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9]*"))
-        {
-            errorLabel.setText("End point URL is not in valid format");
-            return false;
-        }
-        if (requestModelTextArea.getText().isEmpty()) {
-            errorLabel.setText("Request model is empty");
-            return false;
-        }
-        try {
-            JSONObject jsonObject = new JSONObject(requestModelTextArea.getText());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            errorLabel.setText("Request model is not a valid JSON");
-            return false;
+        if(!methodChooserComboBox.getSelectedItem().toString().equals("GET")) {
+            if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
+                errorLabel.setText("End point URL is not in valid format");
+                return false;
+            }
+            if (requestModelTextArea.getText().isEmpty()) {
+                errorLabel.setText("Request model is empty");
+                return false;
+            }
+            try {
+                JSONObject jsonObject = new JSONObject(requestModelTextArea.getText());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                errorLabel.setText("Request model is not a valid JSON");
+                return false;
+            }
         }
 
         if (responseModelTextArea.getText().isEmpty()) {
