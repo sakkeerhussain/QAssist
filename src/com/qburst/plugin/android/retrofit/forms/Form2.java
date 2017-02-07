@@ -106,10 +106,14 @@ public class Form2 {
             public void actionPerformed(ActionEvent e) {
                 if(methodChooserComboBox.getSelectedItem().toString().equals("GET"))
                 {
+                    if(flag)
+                        validData();
                     hideRequestField();
                 }
                 else
                 {
+                    if(flag)
+                        validData();
                     showRequestField();
                 }
             }
