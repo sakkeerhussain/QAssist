@@ -80,9 +80,11 @@ public class FieldModel {
             fieldSb.append("= ").append(value);
         }
         fieldSb.append(";");
-        if (comment != null) {
-            fieldSb.append(" // ").append(comment);
-        }
+
+//        if (comment != null) {
+//            fieldSb.append(" //").append(key).append(" = ").append(comment);
+//        }
+
         return fieldSb.toString();
     }
 
