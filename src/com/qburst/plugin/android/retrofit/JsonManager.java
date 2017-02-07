@@ -245,6 +245,7 @@ public class JsonManager {
     private ClassModel createInnerClass(String className, JSONObject json, ClassModel parentClass) {
 
         ClassModel subClassModel = new ClassModel(parentClass, className, ClassModel.Type.CLASS);
+        subClassModel.setPackageName(parentClass.getQualifiedName());
 
         Set<String> set = json.keySet();
         List<String> list = new ArrayList<>(set);

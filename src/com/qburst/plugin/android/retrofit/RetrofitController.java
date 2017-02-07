@@ -236,6 +236,7 @@ public class RetrofitController {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
                     project, psiDirectoryRequest);
+            classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_REQUEST);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -247,6 +248,7 @@ public class RetrofitController {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
+            classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -258,6 +260,7 @@ public class RetrofitController {
 
         //Creating service class
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
+        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
         for (int i = 0; i < noOfEndPoints; i++) {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
             String methodString = String.format(Constants.ServiceInterface.POST,
@@ -274,6 +277,7 @@ public class RetrofitController {
 
     private boolean createManagerClass(PsiDirectory psiDirectory) {
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
+        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
                 "String", "BASE_URL");
         staticField.setValue(new StringUtils().getValueAsString(baseUrl));
