@@ -88,7 +88,7 @@ public class ClassModel {
     public PsiClass getPsiClassFromText(PsiClass parentClass) {
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
         String classStr = generateClassText();
-        return factory.createClassFromText(classStr, parentClass);
+        return factory.createClassFromText(classStr, parentClass).getInnerClasses()[0];
     }
 
     private String generateClassText() {

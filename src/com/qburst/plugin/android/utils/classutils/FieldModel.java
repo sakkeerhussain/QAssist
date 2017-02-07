@@ -1,6 +1,7 @@
 package com.qburst.plugin.android.utils.classutils;
 
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiField;
 import org.apache.http.util.TextUtils;
@@ -39,7 +40,11 @@ public class FieldModel {
     public PsiField getPsiField() {
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(targetClass.getProject());
         String fieldStr = generateFieldText();
-        return factory.createFieldFromText(fieldStr, targetClass.getDirectory());
+        PsiElement context = targetClass.getDirectory();
+        if (targetClass.getPsiClass() != null){
+            context = targetClass.getPsiClass();
+        }
+        return factory.createFieldFromText(fieldStr, context);
     }
 
     public boolean isSameType(Object o) {

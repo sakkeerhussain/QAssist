@@ -60,13 +60,17 @@ public class ClassManager {
     private boolean addSubClass(ClassModel subClassModel, PsiClass parentClass){
         try {
             PsiClass psiSubClass = subClassModel.getPsiClassFromText(parentClass);
-            parentClass.add(psiSubClass);
+            psiSubClass = (PsiClass) parentClass.add(psiSubClass);
+            subClassModel.setPsiClass(psiSubClass);
             for (FieldModel field:subClassModel.getFields()) {
+                field.setTargetClass(subClassModel);
                 psiSubClass.add(field.getPsiField());
             }
+
             for (PsiMethod method:subClassModel.getMethods()) {
                 psiSubClass.add(method);
             }
+
             for (ClassModel subClass:subClassModel.getSubClasses()) {
                 if (!addSubClass(subClass, psiSubClass)){
                     return false;

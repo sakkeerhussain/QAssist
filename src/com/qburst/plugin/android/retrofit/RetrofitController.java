@@ -131,9 +131,8 @@ public class RetrofitController {
             }else if (!createPackage()){
                 errorMessage = "Creating package failed!";
             }else if (!createClasses()){
-                errorMessage = "Creating package failed!";
+                errorMessage = "Creating Class failed!";
             }
-            ;
 
             if (errorMessage == null){
                 NotificationManager.get().integrationCompletedNotification(project);
@@ -146,7 +145,6 @@ public class RetrofitController {
 
     private boolean addDependencies() {
         if (moduleSelected == null) { return false; }
-        //CreateClassAction f = new CreateClassAction();
         String moduleGradlePath = GradleSettingsFile.getModuleGradlePath(moduleSelected);
         if (moduleGradlePath == null) { return false; }
         GradleSettingsFile mySettingsFile = GradleSettingsFile.get(project);
