@@ -81,7 +81,7 @@
                       <html.disable class="java.lang.Boolean" value="false"/>
                     </clientProperties>
                   </component>
-                  <component id="19980" class="javax.swing.JLabel">
+                  <component id="19980" class="javax.swing.JLabel" binding="requestModelLabel">
                     <constraints>
                       <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -91,7 +91,9 @@
                   </component>
                   <component id="3ae4d" class="javax.swing.JLabel">
                     <constraints>
-                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+                        <preferred-size width="112" height="37"/>
+                      </grid>
                     </constraints>
                     <properties>
                       <text value="Response Model"/>
@@ -113,7 +115,7 @@
                   <component id="1a9c" class="javax.swing.JTextArea" binding="responseModelTextArea">
                     <constraints>
                       <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                        <preferred-size width="150" height="50"/>
+                        <preferred-size width="150" height="37"/>
                         <maximum-size width="-1" height="500"/>
                       </grid>
                     </constraints>
