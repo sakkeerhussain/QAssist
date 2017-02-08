@@ -126,7 +126,7 @@
                     <properties>
                       <doubleBuffered value="false"/>
                       <enabled value="false"/>
-                      <foreground color="-15264396"/>
+                      <foreground color="-1"/>
                       <hideActionText value="false"/>
                       <horizontalTextPosition value="0"/>
                       <text value="Finish"/>

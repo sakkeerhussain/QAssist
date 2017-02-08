@@ -103,7 +103,7 @@ public class JsonManager {
 
     private List<FieldModel> createFields(JSONObject json, List<String> fieldList, ClassModel parentClass) {
         List<FieldModel> fieldModelList = new ArrayList<>();
-        List<String> listEntityList = new ArrayList<String>();
+        List<String> listEntityList = new ArrayList<>();
 
         for (String key : fieldList) {
             Object value = json.get(key);
@@ -193,6 +193,7 @@ public class JsonManager {
                 ClassModel innerClassModel = createInnerClass(createSubClassName(key, type), (JSONObject) type, parentClass);
                 iterableFieldModel.setDeep(deep);
                 iterableFieldModel.setTargetClass(innerClassModel);
+                iterableFieldModel.setType(innerClassModel.getName());
                 item = iterableFieldModel;
             } else {
                 IterableFieldModel fieldModel = new IterableFieldModel(parentClass);
@@ -244,9 +245,10 @@ public class JsonManager {
     private ClassModel createInnerClass(String className, JSONObject json, ClassModel parentClass) {
 
         ClassModel subClassModel = new ClassModel(parentClass, className, ClassModel.Type.CLASS);
+        subClassModel.setPackageName(parentClass.getQualifiedName());
 
         Set<String> set = json.keySet();
-        List<String> list = new ArrayList<String>(set);
+        List<String> list = new ArrayList<>(set);
         List<FieldModel> fields = createFields(json, list, subClassModel);
         subClassModel.addAllFields(fields);
 

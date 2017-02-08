@@ -38,6 +38,7 @@ public class Form2 {
     private JTextField endPointNameTextField;
     private JLabel errorLabel;
     private JLabel requestModelLabel;
+    private JTextField queryParamsTextField;
     private Boolean flag;
 
     private RetrofitController controller;
