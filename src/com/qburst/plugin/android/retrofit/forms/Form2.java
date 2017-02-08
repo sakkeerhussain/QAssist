@@ -105,7 +105,7 @@ public class Form2 {
         methodChooserComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(methodChooserComboBox.getSelectedItem().toString().equals("GET"))
+                if(isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
                 {
                     if(flag)
                         validData();
@@ -162,11 +162,12 @@ public class Form2 {
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
-        if(!methodChooserComboBox.getSelectedItem().toString().equals("GET")) {
-            if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
-                errorLabel.setText("End point URL is not in valid format");
-                return false;
-            }
+        if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
+            errorLabel.setText("End point URL is not in valid format");
+            return false;
+        }
+        if (!isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
+
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
                 return false;
@@ -196,6 +197,13 @@ public class Form2 {
         errorLabel.setText("");
         return true;
 
+    }
+
+    private boolean isPayloadNotSupportingMethod(String method) {
+        return ("GET".equals(method)
+                || "DELETE".equals(method)
+                || "HEAD".equals(method)
+                || "OPTIONS".equals(method));
     }
 
     private String formatJson(String json) {
