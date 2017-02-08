@@ -7,6 +7,7 @@ public class EndPointDataModel {
     private int endPointNo;
     private String endPointName;
     private String endPointUrl;
+    private String queryParams;
     private String method;
     private String requestModel;
     private String responseModel;
@@ -20,6 +21,7 @@ public class EndPointDataModel {
         this.method = "GET";
         this.requestModel = "";
         this.responseModel = "";
+        this.queryParams = "";
     }
 
     public int getEndPointNo() {
@@ -58,6 +60,10 @@ public class EndPointDataModel {
         return Constants.PACKAGE_NAME_RETROFIT_RESPONSE+"."+responseModelClassName;
     }
 
+    public String getQueryParams() {
+        return queryParams;
+    }
+
     //setters
     public void setEndPointNo(int endPointNo) {
         this.endPointNo = endPointNo;
@@ -89,5 +95,9 @@ public class EndPointDataModel {
 
     public void setResponseModelClassName(String responseModelClassName) {
         this.responseModelClassName = responseModelClassName;
+    }
+
+    public void setQueryParams(String queryParams) {
+        this.queryParams = queryParams;
     }
 }

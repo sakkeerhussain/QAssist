@@ -23,6 +23,7 @@ import static java.lang.Character.isDigit;
 public class Form2 {
     private static final String TAG = "Form2";
     private int currentEndPoint;
+    private Boolean flag;
 
     private JButton cancelButton;
     private JButton finishButton;
@@ -39,7 +40,6 @@ public class Form2 {
     private JLabel errorLabel;
     private JLabel requestModelLabel;
     private JTextField queryParamsTextField;
-    private Boolean flag;
 
     private RetrofitController controller;
 
@@ -214,11 +214,10 @@ public class Form2 {
     private void storeData() {
         EndPointDataModel endPointData = new EndPointDataModel();
         endPointData.setEndPointNo(currentEndPoint);
-        // TODO: 23/01/17 Should add empty validation.
         endPointData.setEndPointName(endPointNameTextField.getText());
         endPointData.setEndPointUrl(endPointUrlTextField.getText());
+        endPointData.setQueryParams(queryParamsTextField.getText());
         endPointData.setMethod(methodChooserComboBox.getSelectedItem().toString());
-        // TODO: 23/01/17 Should add json validation.
         endPointData.setRequestModel(requestModelTextArea.getText());
         endPointData.setResponseModel(responseModelTextArea.getText());
         controller.setEndPointDataModel(endPointData);
@@ -231,6 +230,7 @@ public class Form2 {
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
         endPointNameTextField.setText(endPointData.getEndPointName());
         endPointUrlTextField.setText(endPointData.getEndPointUrl());
+        queryParamsTextField.setText(endPointData.getQueryParams());
         methodChooserComboBox.setSelectedItem(endPointData.getMethod());
         requestModelTextArea.setText(endPointData.getRequestModel());
         responseModelTextArea.setText(endPointData.getResponseModel());
