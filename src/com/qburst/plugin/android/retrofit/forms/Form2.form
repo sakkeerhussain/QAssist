@@ -73,6 +73,7 @@
                         <item value="POST"/>
                         <item value="PUT"/>
                         <item value="DELETE"/>
+                        <item value="OPTIONS"/>
                         <item value="PATCH"/>
                       </model>
                       <toolTipText value="Choose API methord"/>
