@@ -226,6 +226,7 @@ public class Form2 {
 
     private void setUpView() {
         flag = false;
+        errorLabel.setText("");
         controller.setTitle("End point " + currentEndPoint);
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
         endPointNameTextField.setText(endPointData.getEndPointName());
