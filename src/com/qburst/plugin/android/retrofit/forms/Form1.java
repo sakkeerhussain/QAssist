@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public class Form1 {
     private List<Module> modules;
 
     private Form1() {
+        modules = new ArrayList<>();
         cancelButton.addActionListener(e -> controller.hideForm());
         //finishButton.addActionListener(e -> {});
         nextButton.addActionListener(e -> {
