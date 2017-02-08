@@ -185,7 +185,7 @@ public class RetrofitController {
     }
 
     private boolean createPackage() {
-        SourceFolder sourceFolder = getSourceRoots().get(0);
+        SourceFolder sourceFolder = getSourceRoots(moduleSelected).get(0);
         DirectoryManager directoryManager = DirectoryManager.get();
         VirtualFile comDir = directoryManager.createDirectory(sourceFolder.getFile(), "com");
         if (comDir == null){ return false; }
@@ -286,7 +286,7 @@ public class RetrofitController {
         return ClassManager.get().createClass(classModel);
     }
 
-    private List<SourceFolder> getSourceRoots() {
+    public List<SourceFolder> getSourceRoots(Module moduleSelected) {
         List<SourceFolder> result = new SmartList<>();
         ModuleRootManager root = ModuleRootManager.getInstance(moduleSelected);
         for (ContentEntry contentEntry : root.getContentEntries()) {
