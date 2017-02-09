@@ -50,6 +50,7 @@ public class RetrofitController {
     private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
 
     private JFrame frame;
+    private SourceFolder sourceFolderSelected;
 
     public void integrateRetrofitAction(AnActionEvent event) {
         this.project = event.getData(PlatformDataKeys.PROJECT);
@@ -94,6 +95,14 @@ public class RetrofitController {
 
     public void setModuleSelected(Module moduleSelected) {
         this.moduleSelected = moduleSelected;
+    }
+    public void setSourceFolderSelected(SourceFolder sourceFolderSelected){
+        this.sourceFolderSelected = sourceFolderSelected;
+    }
+
+    public Module getModuleSelected()
+    {
+     return moduleSelected;
     }
 
     public void setEndPointDataModel(EndPointDataModel endPointDataModel) {
@@ -184,8 +193,9 @@ public class RetrofitController {
         return true;
     }
 
-    private boolean createPackage() {
-        SourceFolder sourceFolder = getSourceRoots(moduleSelected).get(0);
+    private boolean createPackage(){
+        SourceFolder sourceFolder = sourceFolderSelected;
+// getSourceRoots(moduleSelected).get(0);
         DirectoryManager directoryManager = DirectoryManager.get();
         VirtualFile comDir = directoryManager.createDirectory(sourceFolder.getFile(), "com");
         if (comDir == null){ return false; }

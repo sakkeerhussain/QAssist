@@ -3,9 +3,16 @@ package com.qburst.plugin.android.retrofit.forms;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+
+
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.SourceFolder;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,13 +32,16 @@ public class Form1 {
     private JButton nextButton;
     private JComboBox modulesList;
     private JLabel errorLabel;
+    private JComboBox sourceFolderList;
 
     private RetrofitController controller;
     private Project project;
     private List<Module> modules;
+    private List<SourceFolder> sourceFolders;
 
     private Form1() {
         modules = new ArrayList<>();
+        sourceFolders = new ArrayList<>();
         cancelButton.addActionListener(e -> controller.hideForm());
         //finishButton.addActionListener(e -> {});
         nextButton.addActionListener(e -> {
@@ -58,8 +68,35 @@ public class Form1 {
             controller.setBaseUrl(baseUrl);
             controller.setNoOfEndPoints(noOfEndPoints);
             controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
+            controller.setSourceFolderSelected(sourceFolders.get(sourceFolderList.getSelectedIndex()));
             controller.openForm2(true);
         });
+        modulesList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateSourceFolderList();
+            }
+        });
+    }
+
+    private void updateSourceFolderList() {
+        controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
+        ModuleRootManager root = ModuleRootManager.getInstance(controller.getModuleSelected());
+        VirtualFile contentRoot = root.getContentRoots()[0];
+        sourceFolders = controller.getSourceRoots(controller.getModuleSelected());
+        sourceFolderList.removeAllItems();
+        for(SourceFolder sourceFolder: sourceFolders) {
+
+            String contentRootStr = contentRoot.getUrl();
+            String sourceRootStr = sourceFolder.getUrl();
+            if (sourceRootStr.startsWith(contentRootStr)) {
+                sourceFolderList.addItem(sourceRootStr.replaceFirst(contentRootStr, ""));
+            }else{
+                sourceFolderList.addItem(sourceRootStr);
+            }
+        }
+        this.controller.setSourceFolderSelected(sourceFolders.get(0));
+
     }
 
     public static Form1 main(String[] args, JFrame frame) {
@@ -81,10 +118,15 @@ public class Form1 {
                 modules.add(module);
             }
         }
+
         for (Module module : modules) {
             modulesList.addItem(module.getName());
         }
         this.controller.setModuleSelected(modules.get(0));
+        //SOURCE FOLDER LISTING
+
+        updateSourceFolderList();
+
         this.controller.setTitle("base config");
 
         if (baseUrl == null || baseUrl.equals("")){
@@ -100,5 +142,6 @@ public class Form1 {
         if (moduleSelected != null){
             modulesList.setSelectedItem(moduleSelected);
         }
+
     }
 }
