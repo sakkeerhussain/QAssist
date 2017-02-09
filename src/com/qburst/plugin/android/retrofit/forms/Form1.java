@@ -11,6 +11,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -38,39 +40,100 @@ public class Form1 {
     private Project project;
     private List<Module> modules;
     private List<SourceFolder> sourceFolders;
+    private DocumentListener documentListener;
+    private Boolean flag = false;
 
     private Form1() {
+        intializeArrayList();
+        addActionListeners();
+        addDocumenListener();
+
+    }
+
+    private void addDocumenListener() {
+        createDocumentListener();
+        baseUrlTextField.getDocument().addDocumentListener(documentListener);
+        noOfEndPointsTextField.getDocument().addDocumentListener(documentListener);
+    }
+
+
+        private void createDocumentListener() {
+            documentListener = new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    if(flag)
+                        validData();
+
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    if(flag)
+                        validData();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    if(flag)
+                        validData();
+                }
+            };
+        }
+
+
+    private void intializeArrayList() {
         modules = new ArrayList<>();
         sourceFolders = new ArrayList<>();
+    }
+
+    private void addActionListeners() {
+        cancelButtonActionListener();
+        nextButtonActionListener();
+        modulesListActionListener();
+    }
+    private boolean validData()
+    {
+        String baseUrl = baseUrlTextField.getText();
+        try {
+            URL url = new URL(baseUrl);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+        } catch (MalformedURLException exp) {
+            errorLabel.setText("Invalid base URL provided.");
+            return false;
+        } catch (IOException e1) {}
+
+        String noOfEndPointsString = noOfEndPointsTextField.getText();
+        int noOfEndPoints = 0;
+        try {
+            noOfEndPoints = Integer.parseInt(noOfEndPointsString);
+        }catch (Exception exception){
+            errorLabel.setText("Invalid number provided for no. of end points.");
+            return false;
+        }
+        errorLabel.setText("");
+        return true;
+
+    }
+
+
+    private void cancelButtonActionListener() {
         cancelButton.addActionListener(e -> controller.hideForm());
-        //finishButton.addActionListener(e -> {});
+    }
+    private void nextButtonActionListener() {
         nextButton.addActionListener(e -> {
-
-            String baseUrl = baseUrlTextField.getText();
-            try {
-                URL url = new URL(baseUrl);
-                URLConnection conn = url.openConnection();
-                conn.connect();
-            } catch (MalformedURLException exp) {
-                errorLabel.setText("Invalid base URL provided.");
+            flag = true;
+            if(!validData())
                 return;
-            } catch (IOException e1) {}
 
-            String noOfEndPointsString = noOfEndPointsTextField.getText();
-            int noOfEndPoints = 0;
-            try {
-                noOfEndPoints = Integer.parseInt(noOfEndPointsString);
-            }catch (Exception exception){
-                errorLabel.setText("Invalid number provided for no. of end points.");
-                return;
-            }
-
-            controller.setBaseUrl(baseUrl);
-            controller.setNoOfEndPoints(noOfEndPoints);
+            controller.setBaseUrl(baseUrlTextField.getText());
+            controller.setNoOfEndPoints(Integer.parseInt(noOfEndPointsTextField.getText()));
             controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
             controller.setSourceFolderSelected(sourceFolders.get(sourceFolderList.getSelectedIndex()));
             controller.openForm2(true);
         });
+    }
+    private void modulesListActionListener() {
         modulesList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,6 +141,8 @@ public class Form1 {
             }
         });
     }
+
+
 
     private void updateSourceFolderList() {
         controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
