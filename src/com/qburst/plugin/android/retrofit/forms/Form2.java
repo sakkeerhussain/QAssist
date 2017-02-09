@@ -40,24 +40,43 @@ public class Form2 {
     private JLabel requestModelLabel;
     private JTextField queryParamsTextField;
     private Boolean flag;
+    private DocumentListener documentListener;
 
     private RetrofitController controller;
 
     private Form2() {
+        addActionListener();
+        addDocumenListener();
 
-        cancelButton.addActionListener(e -> controller.hideForm());
-        /*finishButton.addActionListener(e -> {
-        });*/
-        previousButton.addActionListener(e -> {
-            flag = true;
-            storeData();
-            if (currentEndPoint <= 1) {
-                controller.openForm1();
-            } else {
-                currentEndPoint--;
-                setUpView();
-            }
+    }
+    private void addActionListener() {
+        cancelButtonActionListener();
+        nextButtonActionListener();
+        previousButtonActionListener();
+        methodChooserComboBoxActionListener();
+        formatRequestButtonActionListener();
+        formatResponseButtonActionListener();
+
+    }
+
+    private void formatResponseButtonActionListener() {
+        formatResponseButton.addActionListener(e -> {
+            String json = responseModelTextArea.getText();
+            responseModelTextArea.setText(formatJson(json));
         });
+
+    }
+
+    private void formatRequestButtonActionListener() {
+        formatRequestButton.addActionListener(e -> {
+            String json = requestModelTextArea.getText();
+            requestModelTextArea.setText(formatJson(json));
+        });
+    }
+    private void cancelButtonActionListener() {
+        cancelButton.addActionListener(e -> controller.hideForm());
+    }
+    private void nextButtonActionListener() {
         nextButton.addActionListener(e -> {
             flag = true;
             if (!validData()) {
@@ -71,37 +90,21 @@ public class Form2 {
                 setUpView();
             }
         });
-        formatRequestButton.addActionListener(e -> {
-            String json = requestModelTextArea.getText();
-            requestModelTextArea.setText(formatJson(json));
-        });
-        formatResponseButton.addActionListener(e -> {
-            String json = responseModelTextArea.getText();
-            responseModelTextArea.setText(formatJson(json));
-        });
-        DocumentListener documentListener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                if(flag)
-                validData();
-            }
+    }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if(flag)
-                validData();
+    private void previousButtonActionListener() {
+        previousButton.addActionListener(e -> {
+            flag = true;
+            storeData();
+            if (currentEndPoint <= 1) {
+                controller.openForm1();
+            } else {
+                currentEndPoint--;
+                setUpView();
             }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                if(flag)
-                validData();
-            }
-        };
-        endPointUrlTextField.getDocument().addDocumentListener(documentListener);
-        endPointNameTextField.getDocument().addDocumentListener(documentListener);
-        requestModelTextArea.getDocument().addDocumentListener(documentListener);
-        responseModelTextArea.getDocument().addDocumentListener(documentListener);
+        });
+    }
+    private void methodChooserComboBoxActionListener() {
         methodChooserComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,21 +122,54 @@ public class Form2 {
                 }
             }
 
-            private void showRequestField() {
-                requestModelTextArea.setVisible(true);
-                requestModelLabel.setVisible(true);
-                formatRequestButton.setVisible(true);
-            }
 
-
-            private void hideRequestField() {
-                if(flag)
-                validData();
-                requestModelTextArea.setVisible(false);
-                requestModelLabel.setVisible(false);
-                formatRequestButton.setVisible(false);
-            }
         });
+    }
+
+    private void addDocumenListener() {
+        createDocumentListener();
+        endPointUrlTextField.getDocument().addDocumentListener(documentListener);
+        endPointNameTextField.getDocument().addDocumentListener(documentListener);
+        requestModelTextArea.getDocument().addDocumentListener(documentListener);
+        responseModelTextArea.getDocument().addDocumentListener(documentListener);
+
+    }
+
+    private void createDocumentListener() {
+        documentListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if(flag)
+                    validData();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                if(flag)
+                    validData();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                if(flag)
+                    validData();
+            }
+        };
+    }
+
+    private void showRequestField() {
+        requestModelTextArea.setVisible(true);
+        requestModelLabel.setVisible(true);
+        formatRequestButton.setVisible(true);
+    }
+
+
+    private void hideRequestField() {
+        if(flag)
+            validData();
+        requestModelTextArea.setVisible(false);
+        requestModelLabel.setVisible(false);
+        formatRequestButton.setVisible(false);
     }
 
     private boolean validData() {
