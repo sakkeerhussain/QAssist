@@ -23,7 +23,6 @@ import static java.lang.Character.isDigit;
 public class Form2 {
     private static final String TAG = "Form2";
     private int currentEndPoint;
-
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -39,8 +38,10 @@ public class Form2 {
     private JLabel errorLabel;
     private JLabel requestModelLabel;
     private JTextField queryParamsTextField;
+
     private Boolean flag;
     private DocumentListener documentListener;
+
 
     private RetrofitController controller;
 
@@ -108,7 +109,7 @@ public class Form2 {
         methodChooserComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(methodChooserComboBox.getSelectedItem().toString().equals("GET"))
+                if(isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
                 {
                     if(flag)
                         validData();
@@ -198,11 +199,12 @@ public class Form2 {
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
-        if(!methodChooserComboBox.getSelectedItem().toString().equals("GET")) {
-            if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
-                errorLabel.setText("End point URL is not in valid format");
-                return false;
-            }
+        if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
+            errorLabel.setText("End point URL is not in valid format");
+            return false;
+        }
+        if (!isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
+
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
                 return false;
@@ -234,6 +236,13 @@ public class Form2 {
 
     }
 
+    private boolean isPayloadNotSupportingMethod(String method) {
+        return ("GET".equals(method)
+                || "DELETE".equals(method)
+                || "HEAD".equals(method)
+                || "OPTIONS".equals(method));
+    }
+
     private String formatJson(String json) {
         json = json.trim();
         if (json.startsWith("{")) {
@@ -250,11 +259,10 @@ public class Form2 {
     private void storeData() {
         EndPointDataModel endPointData = new EndPointDataModel();
         endPointData.setEndPointNo(currentEndPoint);
-        // TODO: 23/01/17 Should add empty validation.
         endPointData.setEndPointName(endPointNameTextField.getText());
         endPointData.setEndPointUrl(endPointUrlTextField.getText());
+        endPointData.setQueryParams(queryParamsTextField.getText());
         endPointData.setMethod(methodChooserComboBox.getSelectedItem().toString());
-        // TODO: 23/01/17 Should add json validation.
         endPointData.setRequestModel(requestModelTextArea.getText());
         endPointData.setResponseModel(responseModelTextArea.getText());
         controller.setEndPointDataModel(endPointData);
@@ -267,6 +275,7 @@ public class Form2 {
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
         endPointNameTextField.setText(endPointData.getEndPointName());
         endPointUrlTextField.setText(endPointData.getEndPointUrl());
+        queryParamsTextField.setText(endPointData.getQueryParams());
         methodChooserComboBox.setSelectedItem(endPointData.getMethod());
         requestModelTextArea.setText(endPointData.getRequestModel());
         responseModelTextArea.setText(endPointData.getResponseModel());

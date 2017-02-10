@@ -73,6 +73,7 @@
                         <item value="POST"/>
                         <item value="PUT"/>
                         <item value="DELETE"/>
+                        <item value="OPTIONS"/>
                         <item value="PATCH"/>
                       </model>
                       <toolTipText value="Choose API methord"/>
@@ -166,7 +167,9 @@
                         <preferred-size width="150" height="-1"/>
                       </grid>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <toolTipText value="Enter Query params as coma separated. eg: Search/Search=sa "/>
+                    </properties>
                   </component>
                   <component id="aaa46" class="javax.swing.JLabel">
                     <constraints>
