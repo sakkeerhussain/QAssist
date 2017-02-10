@@ -51,8 +51,10 @@ public class Constants {
             "    }";
 
     public class ServiceInterface {
-        public static final String POST = "@retrofit2.http.POST(\"%s\")\n" +
-                "    retrofit2.Call<%s> %s(@retrofit2.http.Body %s %s);";
+        public static final String ANNOTATION_FORMAT = "@retrofit2.http.%s(\"%s\")";
+        public static final String METHOD = "%s \n retrofit2.Call<%s> %s(%s);";
+        public static final String REQUEST_PARAM_QUERY = "@retrofit2.http.Query(\"%s\") %s %s, ";
+        public static final String REQUEST_PARAM_BODY = "@retrofit2.http.Body %s %s, ";
     }
 
     public class className{
