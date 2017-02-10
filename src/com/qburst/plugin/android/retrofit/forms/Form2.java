@@ -178,9 +178,7 @@ public class Form2 {
     }
 
     private boolean validData() {
-
         if (endPointNameTextField.getText().isEmpty()) {
-
             errorLabel.setText("End point Name is empty");
             return false;
         }
@@ -188,18 +186,15 @@ public class Form2 {
             errorLabel.setText("End point name starts with digit");
             return false;
         }
-        if(!endPointNameTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9]*"))
-        {
+        if(!endPointNameTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9]*")) {
             errorLabel.setText("End point name is not in valid format");
             return false;
         }
         if (endPointUrlTextField.getText().isEmpty()) {
-
             errorLabel.setText("End point URL is empty");
             return false;
         }
         if (isDigit(endPointUrlTextField.getText().charAt(0))) {
-
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
@@ -208,13 +203,12 @@ public class Form2 {
             return false;
         }
         if (!new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
-
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
                 return false;
             }
             try {
-                JSONObject jsonObject = new JSONObject(requestModelTextArea.getText());
+                new JSONObject(requestModelTextArea.getText());
             } catch (JSONException e) {
                 e.printStackTrace();
                 errorLabel.setText("Request model is not a valid JSON");
@@ -223,15 +217,12 @@ public class Form2 {
         }
 
         if (responseModelTextArea.getText().isEmpty()) {
-
             errorLabel.setText("Response model is empty");
             return false;
         }
         try {
-            JSONObject jsonObject = new JSONObject(responseModelTextArea.getText());
+            new JSONObject(responseModelTextArea.getText());
         } catch (JSONException e) {
-            e.printStackTrace();
-
             errorLabel.setText("Response model is not a valid JSON");
             return false;
         }

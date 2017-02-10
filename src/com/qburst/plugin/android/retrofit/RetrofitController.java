@@ -7,6 +7,7 @@ import com.android.tools.idea.gradle.parser.GradleSettingsFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -145,7 +146,7 @@ public class RetrofitController {
 
             if (errorMessage == null){
                 NotificationManager.get().integrationCompletedNotification(project);
-                GradleProjectImporter.getInstance().requestProjectSync(project, null);
+                ApplicationManager.getApplication().invokeLater(() -> GradleProjectImporter.getInstance().requestProjectSync(project, null));
             }else{
                 NotificationManager.get().integrationFailedNotification( project, errorMessage);
             }
@@ -258,6 +259,7 @@ public class RetrofitController {
     }
 
     private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse) {
+        // TODO: 10/02/17 Create base class for response model accoding to comon fields of all APIs.
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
@@ -279,13 +281,14 @@ public class RetrofitController {
 
             String url = endPointData.getEndPointUrl();
             List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
+            String firstPartOfUrl = new UrlStringUtil().getParamsRemovedUrl(url);
 
             String annotationString = String.format(Constants.ServiceInterface.ANNOTATION_FORMAT,
-                    endPointData.getMethod(), url);
+                    endPointData.getMethod(), firstPartOfUrl);
 
             String requestParamsString = "";
             String requestClassName = endPointData.getSimpleRequestModelClassName();
-            if (!requestClassName.equals("")) {
+            if (requestClassName != null && !requestClassName.equals("")) {
                 String requestClassObjName = new StringUtils().lowersFirstLetter(requestClassName);
                 String reqBodyStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_BODY,
                         requestClassName,
@@ -294,13 +297,14 @@ public class RetrofitController {
             }
             for (UrlParamModel queryParam:queryParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_QUERY,
-                        queryParam.getKey(), "String", queryParam.getValue());
+                        // TODO: 10/02/17 type("String") should changed to corresponding type of value
+                        queryParam.getKey(), "String", new StringUtils().lowersFirstLetter(queryParam.getKey()));
                 requestParamsString = requestParamsString.concat(reqQueryStr);
             }
             if (requestParamsString.length() > 1
                     && requestParamsString.charAt(requestParamsString.length() - 1) == ' '
                     && requestParamsString.charAt(requestParamsString.length() - 2) == ',') {
-                requestParamsString = requestParamsString.substring(0, requestParamsString.length()-1);
+                requestParamsString = requestParamsString.substring(0, requestParamsString.length()-2);
             }
 
             String methodString = String.format(Constants.ServiceInterface.METHOD,
