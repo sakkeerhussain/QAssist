@@ -1,5 +1,6 @@
 package com.qburst.plugin.android.retrofit.forms;
 
+import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.http.HTTPUtils;
@@ -198,7 +199,7 @@ public class Form2 {
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
-        if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
+        if (!endPointUrlTextField.getText().matches(Constants.RegExp.END_POINT_URL)) {
             errorLabel.setText("End point URL is not in valid format");
             return false;
         }
