@@ -23,19 +23,19 @@ import com.qburst.plugin.android.retrofit.forms.Form3;
 import com.qburst.plugin.android.utils.classutils.ClassManager;
 import com.qburst.plugin.android.utils.classutils.ClassModel;
 import com.qburst.plugin.android.utils.classutils.FieldModel;
+import com.qburst.plugin.android.utils.http.HTTPUtils;
+import com.qburst.plugin.android.utils.http.UrlParamModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import com.qburst.plugin.android.utils.string.StringUtils;
+import com.qburst.plugin.android.utils.string.UrlStringUtil;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -244,6 +244,9 @@ public class RetrofitController {
 
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest) {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
+            if (new HTTPUtils().isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
+                return true;
+            }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
                     project, psiDirectoryRequest);
             classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_REQUEST);
@@ -273,12 +276,39 @@ public class RetrofitController {
         classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
         for (int i = 0; i < noOfEndPoints; i++) {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
-            String methodString = String.format(Constants.ServiceInterface.POST,
-                    endPointData.getEndPointUrl(),
+
+            String url = endPointData.getEndPointUrl();
+            List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
+
+            String annotationString = String.format(Constants.ServiceInterface.ANNOTATION_FORMAT,
+                    endPointData.getMethod(), url);
+
+            String requestParamsString = "";
+            String requestClassName = endPointData.getSimpleRequestModelClassName();
+            if (!requestClassName.equals("")) {
+                String requestClassObjName = new StringUtils().lowersFirstLetter(requestClassName);
+                String reqBodyStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_BODY,
+                        requestClassName,
+                        requestClassObjName);
+                requestParamsString = requestParamsString.concat(reqBodyStr);
+            }
+            for (UrlParamModel queryParam:queryParams){
+                String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_QUERY,
+                        queryParam.getKey(), "String", queryParam.getValue());
+                requestParamsString = requestParamsString.concat(reqQueryStr);
+            }
+            if (requestParamsString.length() > 1
+                    && requestParamsString.charAt(requestParamsString.length() - 1) == ' '
+                    && requestParamsString.charAt(requestParamsString.length() - 2) == ',') {
+                requestParamsString = requestParamsString.substring(0, requestParamsString.length()-1);
+            }
+
+            String methodString = String.format(Constants.ServiceInterface.METHOD,
+                    annotationString,
                     endPointData.getResponseModelClassName(),
                     endPointData.getEndPointName(),
-                    endPointData.getRequestModelClassName(),
-                    new StringUtils().lowersFirstLetter(endPointData.getSimpleRequestModelClassName()));
+                    requestParamsString);
+
             classModel.addMethod(methodString);
         }
 

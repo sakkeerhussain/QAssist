@@ -1,7 +1,9 @@
 package com.qburst.plugin.android.retrofit.forms;
 
+import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
+import com.qburst.plugin.android.utils.http.HTTPUtils;
 import com.qburst.plugin.android.utils.log.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +25,11 @@ import static java.lang.Character.isDigit;
 public class Form2 {
     private static final String TAG = "Form2";
     private int currentEndPoint;
+
+    private Boolean flag;
+    private DocumentListener documentListener;
+
+
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -37,10 +44,7 @@ public class Form2 {
     private JTextField endPointNameTextField;
     private JLabel errorLabel;
     private JLabel requestModelLabel;
-    private JTextField queryParamsTextField;
 
-    private Boolean flag;
-    private DocumentListener documentListener;
 
 
     private RetrofitController controller;
@@ -109,7 +113,7 @@ public class Form2 {
         methodChooserComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
+                if(new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
                 {
                     if(flag)
                         validData();
@@ -199,11 +203,11 @@ public class Form2 {
             errorLabel.setText("End point URL starts with digit");
             return false;
         }
-        if (!endPointUrlTextField.getText().matches("[_a-zA-Z][_a-zA-Z0-9/]*")) {
+        if (!endPointUrlTextField.getText().matches(Constants.RegExp.END_POINT_URL)) {
             errorLabel.setText("End point URL is not in valid format");
             return false;
         }
-        if (!isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
+        if (!new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
 
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
@@ -236,13 +240,6 @@ public class Form2 {
 
     }
 
-    private boolean isPayloadNotSupportingMethod(String method) {
-        return ("GET".equals(method)
-                || "DELETE".equals(method)
-                || "HEAD".equals(method)
-                || "OPTIONS".equals(method));
-    }
-
     private String formatJson(String json) {
         json = json.trim();
         if (json.startsWith("{")) {
@@ -261,7 +258,6 @@ public class Form2 {
         endPointData.setEndPointNo(currentEndPoint);
         endPointData.setEndPointName(endPointNameTextField.getText());
         endPointData.setEndPointUrl(endPointUrlTextField.getText());
-        endPointData.setQueryParams(queryParamsTextField.getText());
         endPointData.setMethod(methodChooserComboBox.getSelectedItem().toString());
         endPointData.setRequestModel(requestModelTextArea.getText());
         endPointData.setResponseModel(responseModelTextArea.getText());
@@ -275,7 +271,6 @@ public class Form2 {
         EndPointDataModel endPointData = controller.getEndPointDataModel(currentEndPoint);
         endPointNameTextField.setText(endPointData.getEndPointName());
         endPointUrlTextField.setText(endPointData.getEndPointUrl());
-        queryParamsTextField.setText(endPointData.getQueryParams());
         methodChooserComboBox.setSelectedItem(endPointData.getMethod());
         requestModelTextArea.setText(endPointData.getRequestModel());
         responseModelTextArea.setText(endPointData.getResponseModel());
