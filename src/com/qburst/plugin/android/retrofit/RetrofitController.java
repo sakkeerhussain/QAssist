@@ -36,6 +36,8 @@ import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.*;
 
 /**
@@ -51,6 +53,7 @@ public class RetrofitController {
     private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
 
     private JFrame frame;
+
     private SourceFolder sourceFolderSelected;
 
     public void integrateRetrofitAction(AnActionEvent event) {
@@ -70,6 +73,18 @@ public class RetrofitController {
         Log.d(TAG, "openForm2() called");
         String[] flags = new String[0];
         Form2 form = Form2.main(flags, frame);
+        frame.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                Form2.UrlHelp.hidePopupView();
+
+            }
+        });
         form.setData(this);
         if (fromStart) {
             form.setCurrentEndPoint(1);
