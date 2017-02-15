@@ -41,6 +41,7 @@ public class Form2 {
     private JLabel errorLabel;
     private JLabel requestModelLabel;
     private JButton urlHelpButton;
+    private JScrollPane scrollPanel;
 
 
     private RetrofitController controller;
@@ -49,6 +50,7 @@ public class Form2 {
         addActionListener();
         addDocumenListener();
         addToolTipText();
+
 
     }
 
@@ -280,12 +282,12 @@ public class Form2 {
         frame.setLocationRelativeTo(null);
         frame.getRootPane().setDefaultButton(form.finishButton);
         frame.setVisible(true);
-
+        form.scrollPanel.setBorder(null);
+        form.urlHelpButton.setBorder(null);
         Border border = new JTextField().getBorder();
         //form.methodChooserComboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         form.requestModelTextArea.setBorder(border);
         form.responseModelTextArea.setBorder(border);
-
         return form;
     }
 
