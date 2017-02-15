@@ -48,48 +48,25 @@ public class Form2 {
     private Form2() {
         addActionListener();
         addDocumenListener();
+        addToolTipText();
 
     }
+
+    private void addToolTipText() {
+        endPointUrlTextField.setToolTipText("\"<html>Enter you end point URL with path parameters inside curly bracket with sample value<br/>(Eg: test/{id=4}/details/).<br/><br/>If you have list as value, then give values within a square bracket and have sample values as comma separated<br/>(Eg: names/[\\\"name_1\\\", \\\"name_2\\\"]/save/).<br/><br/> Include your query parameters after a '?' mark with separated '&' symbol<br/>(Eg: url/?key1=value1&key2=value2&field3=value3\\\"</html>\"");
+        urlHelpButton.setToolTipText("\"<html>Enter you end point URL with path parameters inside curly bracket with sample value<br/>(Eg: test/{id=4}/details/).<br/><br/>If you have list as value, then give values within a square bracket and have sample values as comma separated<br/>(Eg: names/[\\\"name_1\\\", \\\"name_2\\\"]/save/).<br/><br/> Include your query parameters after a '?' mark with separated '&' symbol<br/>(Eg: url/?key1=value1&key2=value2&field3=value3\\\"</html>\"");
+
+    }
+
     private void addActionListener() {
         cancelButtonActionListener();
         nextButtonActionListener();
         previousButtonActionListener();
-        urlHelpButtonListener();
         methodChooserComboBoxActionListener();
         formatRequestButtonActionListener();
         formatResponseButtonActionListener();
 
     }
-
-    private void urlHelpButtonListener() {
-        urlHelpButton.addActionListener(e -> {
-            UrlHelp.getPopUpView().show(urlHelpButton,0,0);
-
-        });
-    }
-
-
-
-   public static class UrlHelp
-   {
-     static   JPopupMenu jPopupMenu;
-       public UrlHelp()
-       {
-
-       }
-      public static JPopupMenu  getPopUpView() {
-        jPopupMenu = new JPopupMenu("Pop up");
-          JMenuItem menuItem = new JMenuItem("<html>Enter you end point URL with path parameters inside curly bracket with sample value<br/>(Eg: test/{id=4}/details/).<br/><br/>If you have list as value, then give values within a square bracket and have sample values as comma separated<br/>(Eg: names/[\"name_1\", \"name_2\"]/save/).<br/><br/> Include your query parameters after a '?' mark with separated '&' symbol<br/>(Eg: url/?key1=value1&key2=value2&field3=value3\"</html>");
-          jPopupMenu.add(menuItem);
-          return jPopupMenu;
-       }
-       public static void hidePopupView()
-       {
-           jPopupMenu.setVisible(false);
-       }
-   }
-
-
 
     private void formatResponseButtonActionListener() {
         formatResponseButton.addActionListener(e -> {
