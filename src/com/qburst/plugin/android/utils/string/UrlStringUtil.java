@@ -52,7 +52,7 @@ public class UrlStringUtil {
 
     public List<UrlParamModel> getListOfPathParams(String url){
         String initialPartOfUrl = getParamsRemovedUrl(url);
-        Matcher matcher = Pattern.compile("\\{([a-zA-Z0-9]*=*\\[*\\]*,*)*\\}").matcher(initialPartOfUrl);
+        Matcher matcher = Pattern.compile(Const.PATH_PARAM_REGEX).matcher(initialPartOfUrl);
         List<UrlParamModel> result = new ArrayList<>();
         while(matcher.find()) {
             String matchedString = matcher.group();
@@ -69,7 +69,7 @@ public class UrlStringUtil {
 
     public String getPrettyUrl(String url) {
         String paramsRemovedUrl =  getParamsRemovedUrl(url);
-        Matcher matcher = Pattern.compile("\\{([a-zA-Z0-9]*=*\\[*\\]*,*)*\\}").matcher(paramsRemovedUrl);
+        Matcher matcher = Pattern.compile(Const.PATH_PARAM_REGEX).matcher(paramsRemovedUrl);
         while(matcher.find()) {
             String matchedString = matcher.group();
             String queryKeyWithinBraces = matchedString.substring(0, matchedString.indexOf("=")).concat("}");
@@ -80,22 +80,27 @@ public class UrlStringUtil {
 
     public String getParamType(String value) {
         if (value.startsWith("[")){
-            String type = "List<%s>";
+            String type = "java.util.List<%s>";
             // TODO: 15/02/17 Consider all child values
-            String value1 = value.substring(1).split(",")[0];
+            String value1;
+            if (value.length() >= 2 && value.charAt(1) == '[') {
+                value1 = value.substring(1).split("]")[0];
+            }else {
+                value1 = value.substring(1).split(",")[0];
+            }
             return String.format(type, getParamType(value1));
         }else {
             try{
                 Integer.parseInt(value);
-                return "int";
+                return "Integer";
             }catch (NumberFormatException ignored){}
             try{
                 Float.parseFloat(value);
-                return "float";
+                return "Float";
             }catch (NumberFormatException ignored){}
             try{
                 Double.parseDouble(value);
-                return "double";
+                return "Double";
             }catch (NumberFormatException ignored){}
             return "String";
         }
