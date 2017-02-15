@@ -281,6 +281,7 @@ public class RetrofitController {
 
             String url = endPointData.getEndPointUrl();
             List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
+            List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(url);
             String firstPartOfUrl = new UrlStringUtil().getParamsRemovedUrl(url);
 
             String annotationString = String.format(Constants.ServiceInterface.ANNOTATION_FORMAT,
@@ -294,6 +295,12 @@ public class RetrofitController {
                         requestClassName,
                         requestClassObjName);
                 requestParamsString = requestParamsString.concat(reqBodyStr);
+            }
+            for (UrlParamModel pathParam:pathParams){
+                String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_PATH,
+                        // TODO: 10/02/17 type("String") should changed to corresponding type of value
+                        pathParam.getKey(), "String", new StringUtils().lowersFirstLetter(pathParam.getKey()));
+                requestParamsString = requestParamsString.concat(reqQueryStr);
             }
             for (UrlParamModel queryParam:queryParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_QUERY,
