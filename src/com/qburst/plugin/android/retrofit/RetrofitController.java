@@ -118,7 +118,7 @@ public class RetrofitController {
 
     public Module getModuleSelected()
     {
-     return moduleSelected;
+        return moduleSelected;
     }
 
     public void setEndPointDataModel(EndPointDataModel endPointDataModel) {
@@ -149,6 +149,7 @@ public class RetrofitController {
 
     public void integrateRetrofit() {
         hideForm();
+
         WriteCommandAction.runWriteCommandAction(project, () -> {
             String errorMessage = null;
             if (!addDependencies()){
@@ -211,7 +212,7 @@ public class RetrofitController {
 
     private boolean createPackage(){
         SourceFolder sourceFolder = sourceFolderSelected;
-// getSourceRoots(moduleSelected).get(0);
+//      getSourceRoots(moduleSelected).get(0);
         DirectoryManager directoryManager = DirectoryManager.get();
         VirtualFile comDir = directoryManager.createDirectory(sourceFolder.getFile(), "com");
         if (comDir == null){ return false; }
