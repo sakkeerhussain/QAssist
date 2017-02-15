@@ -54,6 +54,7 @@ public class Constants {
         public static final String ANNOTATION_FORMAT = "@retrofit2.http.%s(\"%s\")";
         public static final String METHOD = "%s \n retrofit2.Call<%s> %s(%s);";
         public static final String REQUEST_PARAM_QUERY = "@retrofit2.http.Query(\"%s\") %s %s, ";
+        public static final String REQUEST_PARAM_PATH = "@retrofit2.http.Path(\"%s\") %s %s, ";
         public static final String REQUEST_PARAM_BODY = "@retrofit2.http.Body %s %s, ";
     }
 
