@@ -295,12 +295,10 @@ public class RetrofitController {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
 
             String url = endPointData.getEndPointUrl();
-            List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
-            List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(url);
-            String firstPartOfUrl = new UrlStringUtil().getParamsRemovedUrl(url);
+            String prettyUrl = new UrlStringUtil().getPrettyUrl(url);
 
             String annotationString = String.format(Constants.ServiceInterface.ANNOTATION_FORMAT,
-                    endPointData.getMethod(), firstPartOfUrl);
+                    endPointData.getMethod(), prettyUrl);
 
             String requestParamsString = "";
             String requestClassName = endPointData.getSimpleRequestModelClassName();
@@ -311,16 +309,20 @@ public class RetrofitController {
                         requestClassObjName);
                 requestParamsString = requestParamsString.concat(reqBodyStr);
             }
+
+            List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(url);
             for (UrlParamModel pathParam:pathParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_PATH,
-                        // TODO: 10/02/17 type("String") should changed to corresponding type of value
-                        pathParam.getKey(), "String", new StringUtils().lowersFirstLetter(pathParam.getKey()));
+                        pathParam.getKey(), new UrlStringUtil().getParamType(pathParam.getValue()),
+                        new StringUtils().lowersFirstLetter(pathParam.getKey()));
                 requestParamsString = requestParamsString.concat(reqQueryStr);
             }
+
+            List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
             for (UrlParamModel queryParam:queryParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_QUERY,
-                        // TODO: 10/02/17 type("String") should changed to corresponding type of value
-                        queryParam.getKey(), "String", new StringUtils().lowersFirstLetter(queryParam.getKey()));
+                        queryParam.getKey(), new UrlStringUtil().getParamType(queryParam.getValue()),
+                        new StringUtils().lowersFirstLetter(queryParam.getKey()));
                 requestParamsString = requestParamsString.concat(reqQueryStr);
             }
             if (requestParamsString.length() > 1
