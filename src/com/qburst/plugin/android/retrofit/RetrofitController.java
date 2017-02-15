@@ -73,18 +73,6 @@ public class RetrofitController {
         Log.d(TAG, "openForm2() called");
         String[] flags = new String[0];
         Form2 form = Form2.main(flags, frame);
-        frame.addWindowFocusListener(new WindowFocusListener() {
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowLostFocus(WindowEvent e) {
-                Form2.UrlHelp.hidePopupView();
-
-            }
-        });
         form.setData(this);
         if (fromStart) {
             form.setCurrentEndPoint(1);
@@ -373,4 +361,5 @@ public class RetrofitController {
     public void setNoOfEndPoints(int noOfEndPoints) {
         this.noOfEndPoints = noOfEndPoints;
     }
+
 }
