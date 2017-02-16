@@ -259,25 +259,16 @@ public class Form2 {
         {
             keys.add(pathParams.get(i).getKey());
         }
-        int repeatedKeyIndex=  -1;
-        for(int i=0;i<keys.size() && repeatedKeyIndex<0;i++)
+        for(int i=0;i<keys.size();i++)
         {
-            for(int j=i+1;j<keys.size() && repeatedKeyIndex<0;j++)
+            for(int j=i+1;j<keys.size();j++)
             {
                 if(keys.get(i).equals(keys.get(j))) {
-                    repeatedKeyIndex = j;
+                   return "Key \'"+keys.get(j)+"\' is repeated";
                 }
             }
         }
-
-        if(repeatedKeyIndex==-1){
-            return null;
-        }
-        else {
-            return "Key \'"+keys.get(repeatedKeyIndex)+"\' is repeated";
-        }
-
-
+      return null;
     }
 
     private String formatJson(String json) {
