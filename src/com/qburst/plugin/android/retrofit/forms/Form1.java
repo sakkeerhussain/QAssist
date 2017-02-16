@@ -35,6 +35,7 @@ public class Form1 {
     private JComboBox modulesList;
     private JLabel errorLabel;
     private JComboBox sourceFolderList;
+    private JTextField packageNameTextField;
 
     private RetrofitController controller;
     private Project project;
@@ -91,8 +92,8 @@ public class Form1 {
         nextButtonActionListener();
         modulesListActionListener();
     }
-    private boolean validData()
-    {
+
+    private boolean validData() {
         String baseUrl = baseUrlTextField.getText();
         try {
             URL url = new URL(baseUrl);
@@ -101,12 +102,11 @@ public class Form1 {
         } catch (MalformedURLException exp) {
             errorLabel.setText("Invalid base URL provided.");
             return false;
-        } catch (IOException e1) {}
+        } catch (IOException ignored) {}
 
         String noOfEndPointsString = noOfEndPointsTextField.getText();
-        int noOfEndPoints = 0;
         try {
-            noOfEndPoints = Integer.parseInt(noOfEndPointsString);
+            Integer.parseInt(noOfEndPointsString);
         }catch (Exception exception){
             errorLabel.setText("Invalid number provided for no. of end points.");
             return false;
@@ -127,6 +127,7 @@ public class Form1 {
                 return;
 
             controller.setBaseUrl(baseUrlTextField.getText());
+            controller.setPackageName(packageNameTextField.getText());
             controller.setNoOfEndPoints(Integer.parseInt(noOfEndPointsTextField.getText()));
             controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
             controller.setSourceFolderSelected(sourceFolders.get(sourceFolderList.getSelectedIndex()));
@@ -134,12 +135,7 @@ public class Form1 {
         });
     }
     private void modulesListActionListener() {
-        modulesList.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSourceFolderList();
-            }
-        });
+        modulesList.addActionListener(e -> updateSourceFolderList());
     }
 
 
@@ -175,7 +171,7 @@ public class Form1 {
         return form;
     }
 
-    public void setData(RetrofitController controller, Project project, String baseUrl, int noOfEndPoints, Module moduleSelected){
+    public void setData(RetrofitController controller, Project project, String baseUrl, String packageName, int noOfEndPoints, Module moduleSelected){
         this.controller = controller;
         this.project = project;
         for (Module module:ModuleManager.getInstance(project).getModules()){
@@ -207,6 +203,7 @@ public class Form1 {
         if (moduleSelected != null){
             modulesList.setSelectedItem(moduleSelected);
         }
+        packageNameTextField.setText(packageName);
 
     }
 }
