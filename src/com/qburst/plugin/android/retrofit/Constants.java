@@ -67,5 +67,7 @@ public class Constants {
         public static final String END_POINT_URL_PARAMS = "(\\?([a-zA-Z][a-zA-Z0-9_]*)=[^&=]+(&([a-zA-Z][a-zA-Z0-9_]*)=[^&=]+)*)?";
         public static final String END_POINT_URL_FIRST = "([a-zA-Z_/0-9]*((\\{{1})([a-zA-Z][a-zA-Z0-9_]*)=[^}]+(}{1})*)*)*";
         public static final String END_POINT_URL = END_POINT_URL_FIRST + END_POINT_URL_PARAMS;
+        public static final String PACKAGE_NAME = "[_a-zA-Z][_a-zA-Z0-9]*(\\.[_a-zA-Z][_a-zA-Z0-9]*)*";
+
     }
 }

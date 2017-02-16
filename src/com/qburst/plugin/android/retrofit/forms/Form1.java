@@ -8,19 +8,22 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiPackage;
+import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.bouncycastle.crypto.tls.AlertLevel.warning;
 
 /**
  * Created by sakkeer on 11/01/17.
@@ -36,13 +39,15 @@ public class Form1 {
     private JLabel errorLabel;
     private JComboBox sourceFolderList;
     private JTextField packageNameTextField;
+    private JLabel packageNameWarningLabel;
 
     private RetrofitController controller;
     private Project project;
     private List<Module> modules;
     private List<SourceFolder> sourceFolders;
-    private DocumentListener documentListener;
+    private DocumentListener errorListener;
     private Boolean flag = false;
+    private DocumentListener warningListener;
 
     private Form1() {
         intializeArrayList();
@@ -53,13 +58,27 @@ public class Form1 {
 
     private void addDocumenListener() {
         createDocumentListener();
-        baseUrlTextField.getDocument().addDocumentListener(documentListener);
-        noOfEndPointsTextField.getDocument().addDocumentListener(documentListener);
+        baseUrlTextField.getDocument().addDocumentListener(errorListener);
+        noOfEndPointsTextField.getDocument().addDocumentListener(errorListener);
+        packageNameTextField.getDocument().addDocumentListener(errorListener);
+        packageNameTextField.getDocument().addDocumentListener(warningListener);
+
+    }
+
+    private void validPackage() {
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageNameTextField.getText());
+        if (!(pkg == null)){
+            packageNameWarningLabel.setText("Creating package with same name over writes the existing one");
+            return;
+        }
+        packageNameWarningLabel.setText("");
+        return;
+
     }
 
 
-        private void createDocumentListener() {
-            documentListener = new DocumentListener() {
+    private void createDocumentListener() {
+            errorListener = new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent e) {
                     if(flag)
@@ -79,6 +98,23 @@ public class Form1 {
                         validData();
                 }
             };
+
+         warningListener = new DocumentListener() {
+             @Override
+             public void insertUpdate(DocumentEvent e) {
+                     validPackage();
+             }
+
+             @Override
+             public void removeUpdate(DocumentEvent e) {
+                     validPackage();
+             }
+
+             @Override
+             public void changedUpdate(DocumentEvent e) {
+                     validPackage();
+             }
+        };
         }
 
 
@@ -109,6 +145,10 @@ public class Form1 {
             Integer.parseInt(noOfEndPointsString);
         }catch (Exception exception){
             errorLabel.setText("Invalid number provided for no. of end points.");
+            return false;
+        }
+        if(!packageNameTextField.getText().matches(Constants.RegExp.PACKAGE_NAME)) {
+            errorLabel.setText("Package name cannot start or end with '.'");
             return false;
         }
         errorLabel.setText("");
