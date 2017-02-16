@@ -257,7 +257,7 @@ public class RetrofitController {
 
 
         //get retrofit directory
-        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT);
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageName);
         if (pkg == null){
             return false;
         }
