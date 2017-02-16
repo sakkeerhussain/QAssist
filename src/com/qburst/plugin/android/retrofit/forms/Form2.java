@@ -27,11 +27,8 @@ import static java.lang.Character.isDigit;
 public class Form2 {
     private static final String TAG = "Form2";
     private int currentEndPoint;
-
     private Boolean flag;
     private DocumentListener documentListener;
-
-
     private JButton cancelButton;
     private JButton finishButton;
     private JPanel rootPanel;
@@ -48,16 +45,11 @@ public class Form2 {
     private JLabel requestModelLabel;
     private JButton urlHelpButton;
     private JScrollPane scrollPanel;
-
-
     private RetrofitController controller;
-
     private Form2() {
         addActionListener();
         addDocumenListener();
         addToolTipText();
-
-
     }
 
     private void addToolTipText() {
