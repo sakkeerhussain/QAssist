@@ -1,5 +1,6 @@
 package com.qburst.plugin.android.retrofit;
 
+import android.app.assist.AssistStructure;
 import com.android.tools.idea.gradle.parser.BuildFileKey;
 import com.android.tools.idea.gradle.parser.Dependency;
 import com.android.tools.idea.gradle.parser.GradleBuildFile;
@@ -10,6 +11,9 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -30,6 +34,7 @@ import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import com.qburst.plugin.android.utils.string.StringUtils;
 import com.qburst.plugin.android.utils.string.UrlStringUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
@@ -49,8 +54,14 @@ public class RetrofitController {
     private Project project;
     private Module moduleSelected;
     private String baseUrl;
+    private String packageName;
     private int noOfEndPoints;
-    private List<EndPointDataModel> endPointDataModelList = new ArrayList<>();
+    private List<EndPointDataModel> endPointDataModelList;
+
+    public RetrofitController() {
+        endPointDataModelList = new ArrayList<>();
+        packageName = Constants.PACKAGE_NAME_RETROFIT;
+    }
 
     private JFrame frame;
 
@@ -66,7 +77,7 @@ public class RetrofitController {
         Log.d(TAG, "openForm1() called");
         String[] flags = new String[0];
         Form1 form1 = Form1.main(flags, frame);
-        form1.setData(this, project, baseUrl, noOfEndPoints, moduleSelected);
+        form1.setData(this, project, baseUrl, packageName, noOfEndPoints, moduleSelected);
     }
 
     public void openForm2(boolean fromStart){
@@ -137,27 +148,34 @@ public class RetrofitController {
 
     public void integrateRetrofit() {
         hideForm();
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Integrating Retrofit") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(false);
+                indicator.setFraction(0);
+                WriteCommandAction.runWriteCommandAction(project, () -> {
+                    String errorMessage = null;
+                    if (!addDependencies(indicator)) {
+                        errorMessage = "Dependency injection failed!";
+                    } else if (!createPackage(indicator)) {
+                        errorMessage = "Creating package failed!";
+                    } else if (!createClasses(indicator)) {
+                        errorMessage = "Creating Class failed!";
+                    }
 
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-            String errorMessage = null;
-            if (!addDependencies()){
-                errorMessage = "Dependency injection failed!";
-            }else if (!createPackage()){
-                errorMessage = "Creating package failed!";
-            }else if (!createClasses()){
-                errorMessage = "Creating Class failed!";
-            }
-
-            if (errorMessage == null){
-                NotificationManager.get().integrationCompletedNotification(project);
-                ApplicationManager.getApplication().invokeLater(() -> GradleProjectImporter.getInstance().requestProjectSync(project, null));
-            }else{
-                NotificationManager.get().integrationFailedNotification( project, errorMessage);
+                    if (errorMessage == null) {
+                        NotificationManager.get().integrationCompletedNotification(project);
+                        ApplicationManager.getApplication().invokeLater(() -> GradleProjectImporter.getInstance().requestProjectSync(project, null));
+                    } else {
+                        NotificationManager.get().integrationFailedNotification(project, errorMessage);
+                    }
+                });
             }
         });
     }
 
-    private boolean addDependencies() {
+    private boolean addDependencies(ProgressIndicator indicator) {
+        indicator.setText("Adding dependencies");
         if (moduleSelected == null) { return false; }
         String moduleGradlePath = GradleSettingsFile.getModuleGradlePath(moduleSelected);
         if (moduleGradlePath == null) { return false; }
@@ -198,36 +216,42 @@ public class RetrofitController {
         return true;
     }
 
-    private boolean createPackage(){
-        SourceFolder sourceFolder = sourceFolderSelected;
-//      getSourceRoots(moduleSelected).get(0);
+    private boolean createPackage(ProgressIndicator indicator){
+        indicator.setText("Creating directories");
+        indicator.setFraction(0.2);
         DirectoryManager directoryManager = DirectoryManager.get();
-        VirtualFile comDir = directoryManager.createDirectory(sourceFolder.getFile(), "com");
-        if (comDir == null){ return false; }
-        VirtualFile qBurstDir = directoryManager.createDirectory(comDir, "qburst");
-        if (qBurstDir == null){ return false; }
-        VirtualFile retrofitDir = directoryManager.createDirectory(qBurstDir, "retrofit");
-        if (retrofitDir == null){ return false; }
-        VirtualFile modelDir = directoryManager.createDirectory(retrofitDir, "model");
+
+        String[] dirNames = packageName.split("\\.");
+        VirtualFile dir = sourceFolderSelected.getFile();
+        for (String dirName : dirNames) {
+            dir = directoryManager.createDirectory(dir, dirName);
+            if (dir == null){ return false; }
+        }
+        VirtualFile modelDir = directoryManager.createDirectory(dir, "model");
         if (modelDir == null){ return false; }
         if (directoryManager.createDirectory(modelDir, "request") == null){ return false; }
         if (directoryManager.createDirectory(modelDir, "response") == null){ return false; }
+
         return true;
     }
 
-    private boolean createClasses() {
+    private boolean createClasses(ProgressIndicator indicator) {
 
-        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT_REQUEST);
-        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
         if (pkgRequest == null || pkgResponse == null){
             //NotificationManager.get().integrationFailedNotification(project, errorMessage);
             return false;
         }
 
-        if (!createRequestModelClasses(pkgRequest.getDirectories()[0])){
+        indicator.setText("Creating request model classes");
+        indicator.setFraction(0.4);
+        if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)){
             return false;
         }
-        if (!createResponseModelClasses(pkgResponse.getDirectories()[0])){
+        indicator.setText("Creating response model classes");
+        indicator.setFraction(0.6);
+        if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)){
             return false;
         }
 
@@ -238,23 +262,24 @@ public class RetrofitController {
             return false;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        if (!createServiceClass(psiDirectory)){
+        if (!createServiceClass(psiDirectory, indicator)){
             return false;
         }
-        if (!createManagerClass(psiDirectory)){
+        if (!createManagerClass(psiDirectory, indicator)){
             return false;
         }
         return true;
     }
 
-    private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest) {
+    private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             if (new HTTPUtils().isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
                 return true;
             }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
                     project, psiDirectoryRequest);
-            classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+            indicator.setText("Creating "+classModel.getName());
+            classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -262,12 +287,13 @@ public class RetrofitController {
         return true;
     }
 
-    private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse) {
+    private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse, ProgressIndicator indicator) {
         // TODO: 10/02/17 Create base class for response model accoding to comon fields of all APIs.
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
             classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+            indicator.setText("Creating "+classModel.getName());
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -275,9 +301,11 @@ public class RetrofitController {
         return true;
     }
 
-    private boolean createServiceClass(PsiDirectory psiDirectory) {
+    private boolean createServiceClass(PsiDirectory psiDirectory, ProgressIndicator indicator) {
 
         //Creating service class
+        indicator.setText("Creating service class");
+        indicator.setFraction(0.8);
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
         classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
         for (int i = 0; i < noOfEndPoints; i++) {
@@ -322,7 +350,7 @@ public class RetrofitController {
 
             String methodString = String.format(Constants.ServiceInterface.METHOD,
                     annotationString,
-                    endPointData.getResponseModelClassName(),
+                    packageName + endPointData.getResponseModelClassName(),
                     endPointData.getEndPointName(),
                     requestParamsString);
 
@@ -332,7 +360,9 @@ public class RetrofitController {
         return ClassManager.get().createClass(classModel);
     }
 
-    private boolean createManagerClass(PsiDirectory psiDirectory) {
+    private boolean createManagerClass(PsiDirectory psiDirectory, ProgressIndicator indicator) {
+        indicator.setText("Creating manager class");
+        indicator.setFraction(1.0);
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
         classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
@@ -366,6 +396,10 @@ public class RetrofitController {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public void setNoOfEndPoints(int noOfEndPoints) {

@@ -46,10 +46,6 @@ public class EndPointDataModel {
         return endPointName;
     }
 
-    public String getRequestModelClassName() {
-        return Constants.PACKAGE_NAME_RETROFIT_REQUEST+"."+requestModelClassName;
-    }
-
     public String getSimpleRequestModelClassName() {
         return requestModelClassName;
     }
