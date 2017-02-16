@@ -4,7 +4,9 @@ import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.EndPointDataModel;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.http.HTTPUtils;
+import com.qburst.plugin.android.utils.http.UrlParamModel;
 import com.qburst.plugin.android.utils.log.Log;
+import com.qburst.plugin.android.utils.string.UrlStringUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +15,10 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import static java.lang.Character.isDigit;
 
 /**
@@ -208,6 +214,11 @@ public class Form2 {
             errorLabel.setText("End point URL is not in valid format");
             return false;
         }
+        if(!Objects.equals(checkForKeyRepeatation(), null))
+        {
+            errorLabel.setText(checkForKeyRepeatation());
+            return false;
+        }
         if (!new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
@@ -235,6 +246,29 @@ public class Form2 {
         errorLabel.setText("");
         return true;
 
+    }
+    private String checkForKeyRepeatation() {
+        List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(endPointUrlTextField.getText());
+        List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(endPointUrlTextField.getText());
+        List<String> keys = new ArrayList<String>();
+        for(int i=0;i<queryParams.size();i++)
+        {
+            keys.add( queryParams.get(i).getKey());
+        }
+        for(int i=0;i<pathParams.size();i++)
+        {
+            keys.add(pathParams.get(i).getKey());
+        }
+        for(int i=0;i<keys.size();i++)
+        {
+            for(int j=i+1;j<keys.size();j++)
+            {
+                if(keys.get(i).equals(keys.get(j))) {
+                   return "Key \'"+keys.get(j)+"\' is repeated";
+                }
+            }
+        }
+      return null;
     }
 
     private String formatJson(String json) {
