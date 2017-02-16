@@ -307,7 +307,7 @@ public class RetrofitController {
         indicator.setText("Creating service class");
         indicator.setFraction(0.8);
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
-        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
+        classModel.setPackageName(packageName);
         for (int i = 0; i < noOfEndPoints; i++) {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
 
@@ -364,7 +364,7 @@ public class RetrofitController {
         indicator.setText("Creating manager class");
         indicator.setFraction(1.0);
         ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
-        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
+        classModel.setPackageName(packageName);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
                 "String", "BASE_URL");
         staticField.setValue(new StringUtils().getValueAsString(baseUrl));
