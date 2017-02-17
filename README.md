@@ -23,18 +23,12 @@ Restart IDE.
 ## Usage
 ### Use IDE menu
 
-![Generate.png](http://upload-images.jianshu.io/upload_images/166866-2c5168c72b7155ba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- 
-### Use hotkey
+![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23057466/5433a7dc-f516-11e6-9788-cdd37273c1c6.png)
 
-Default **Option + s**(Mac), **Alt + s** (win)
-
-You can change the hotkey via: 
-![修改快捷键.png](http://upload-images.jianshu.io/upload_images/166866-f9e20ca0ad7b9ae4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-
-## Demo picture
-![gsonFormat.gif](http://upload-images.jianshu.io/upload_images/166866-ff9dc336af72d7d7.gif?imageMogr2/auto-orient/strip)
+## Demo pictures
+![Form 1.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
+![Form 2.png](https://cloud.githubusercontent.com/assets/7835361/23055729/5e209dee-f50d-11e6-933e-bcde2953d00a.png)
+![Form 3.png](https://cloud.githubusercontent.com/assets/7835361/23055731/5e215176-f50d-11e6-824a-a8d2a1d469f7.png)
   
 ## Version Info
 
