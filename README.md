@@ -1,47 +1,35 @@
 QBurst Android Plugin
     1. Retrofit Integrator
 ------
-  [jetbrains](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
-  [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GsonFormat-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1896)
-  [swift](https://github.com/EnjoySR/ESJsonFormat-Xcode)
-  [Json Annotation](https://github.com/tianzhijiexian/JsonAnnotation)
 
 This is a plugin you can generate Json model from Json String.
 Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 
-## Install   
+## Install
 - Using IDE built-in plugin system on Windows:
-  - <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "GsonFormat"</kbd> > <kbd>Install Plugin</kbd>
+  - <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "QBurstAndroidPlugin"</kbd> > <kbd>Install Plugin</kbd>
 - Using IDE built-in plugin system on MacOs:
-  - <kbd>Preferences</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "GsonFormat"</kbd> > <kbd>Install Plugin</kbd>
+  - <kbd>Preferences</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "QBurstAndroidPlugin"</kbd> > <kbd>Install Plugin</kbd>
 - Manually:
-  - Download the [latest release](https://github.com/zzz40500/GsonFormat/releases/latest) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
-  - From official jetbrains store from [download](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
-  
+  - Download the [latest release](https://github.com/sakkeerhussain/qburst-android-plugin/files/782512/QBurstAndroidPlugin_16_02_2017.jar.zip) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
+
 Restart IDE.
 
 ## Usage
 ### Use IDE menu
 
-![Generate.png](http://upload-images.jianshu.io/upload_images/166866-2c5168c72b7155ba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- 
-### Use hotkey
-
-Default **Option + s**(Mac), **Alt + s** (win)
-
-You can change the hotkey via: 
-![修改快捷键.png](http://upload-images.jianshu.io/upload_images/166866-f9e20ca0ad7b9ae4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
+![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23055729/5e209dee-f50d-11e6-933e-bcde2953d00a.png)
 
 
 ## Demo picture
 ![gsonFormat.gif](http://upload-images.jianshu.io/upload_images/166866-ff9dc336af72d7d7.gif?imageMogr2/auto-orient/strip)
-  
+
 ## Version Info
 
 v1.0
-> 
-* Supports Integration of all http methods.
-* Supports shortcut to open GsonFormat, default option + s (mac), alt + s (win)
+>
+* Supports Integration of retrofit.
 * Support creation of model(POJO/Dao) classes.
 
 ## License
