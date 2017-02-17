@@ -4,10 +4,7 @@ This plugin is intented to reduce effort of Android application development by g
 
     1. Retrofit Integrator
 ------
-  [jetbrains](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
-  [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GsonFormat-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1896)
-  [swift](https://github.com/EnjoySR/ESJsonFormat-Xcode)
-  [Json Annotation](https://github.com/tianzhijiexian/JsonAnnotation)
+  [jetbrains](https://plugins.jetbrains.com/androidstudio/plugin/9487-qburst-android-plugin)
 
 This is a plugin you can generate Json model from Json String.
 Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
