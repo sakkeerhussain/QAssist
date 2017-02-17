@@ -23,7 +23,7 @@ Restart IDE.
 ## Usage
 ### Use IDE menu
 
-![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23057466/5433a7dc-f516-11e6-9788-cdd37273c1c6.png)
+![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23060290/26f98fae-f523-11e6-9d9c-6be6f8012900.png)
 
 ## Demo pictures
 ![Form 1.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
