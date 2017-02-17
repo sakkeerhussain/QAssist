@@ -18,8 +18,8 @@ Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 - Using IDE built-in plugin system on MacOs:
   - <kbd>Preferences</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "GsonFormat"</kbd> > <kbd>Install Plugin</kbd>
 - Manually:
-  - Download the [latest release](https://github.com/zzz40500/GsonFormat/releases/latest) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
-  - From official jetbrains store from [download](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
+  - Download the [latest release](https://github.com/sakkeerhussain/qburst-android-plugin/files/782770/QBurstAndroidPlugin_17-02-2017.jar.zip) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
+  - From official jetbrains store from [download](https://plugins.jetbrains.com/plugin/)
   
 Restart IDE.
 
