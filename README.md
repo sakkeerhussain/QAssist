@@ -1,4 +1,7 @@
 QBurst Android Plugin
+
+This plugin is intented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only it can be be used to Integrate Retrofit to your project(for server communications).
+
     1. Retrofit Integrator
 ------
   [jetbrains](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
