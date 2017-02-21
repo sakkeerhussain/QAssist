@@ -24,4 +24,15 @@ public class RetrofitRepairAction extends AnAction {
         Project project = e.getProject();
         NotificationManager.get().showNotificationInfo(project, "Retrofit", "Repair", "Not yet implemented!");
     }
+
+    @Override
+    public void update(AnActionEvent e) {
+        super.update(e);
+        if(e.getPresentation().isEnabled()) {
+            e.getPresentation().setEnabled(false);
+        }
+        else{
+            e.getPresentation().setEnabled(true);
+        }
+    }
 }
