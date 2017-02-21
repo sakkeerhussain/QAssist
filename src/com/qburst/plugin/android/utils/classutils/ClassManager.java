@@ -1,11 +1,17 @@
 package com.qburst.plugin.android.utils.classutils;
 
+import com.intellij.ide.util.DirectoryUtil;
+import com.intellij.openapi.externalSystem.model.project.ContentRootData;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.impl.file.PsiDirectoryImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
+import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
-import com.qburst.plugin.android.utils.notification.NotificationManager;
 
 /**
  * Created by sakkeer on 01/02/17.
@@ -87,6 +93,28 @@ public class ClassManager {
             if (file.getClass() == PsiJavaFileImpl.class
                     && ((PsiJavaFileImpl)file).getName().equals(name+".java")){
                 return (PsiJavaFileImpl) file;
+            }
+        }
+        return null;
+    }
+
+    public PsiJavaFileImpl isClassExists(String name, Project project, RetrofitController controller){
+        for (Module module:ModuleManager.getInstance(project).getModules()){
+            for (SourceFolder sourceRoot:controller.getSourceRoots(module)){
+                if (sourceRoot.getFile().isDirectory()){
+                    PsiDirectory dir = (PsiDirectory) sourceRoot.getFile();
+                    PsiJavaFileImpl managerClass = isClassExists(dir, name);
+                    if (managerClass != null){
+                        return managerClass;
+                    }
+                    for (PsiElement child:dir.getChildren()){
+                        Log.d("adad", child.toString());
+                        managerClass = isClassExists((PsiDirectory)child.getContainingFile(), name);
+                        if (managerClass != null){
+                            return managerClass;
+                        }
+                    }
+                }
             }
         }
         return null;

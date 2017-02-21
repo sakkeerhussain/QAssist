@@ -73,6 +73,11 @@ public class RetrofitController {
         openForm1();
     }
 
+    public void repairRetrofitAction(AnActionEvent event) {
+        this.project = event.getData(PlatformDataKeys.PROJECT);
+        ClassManager.get().isClassExists("RetrofitManager", project, this);
+    }
+
     public void openForm1(){
         Log.d(TAG, "openForm1() called");
         String[] flags = new String[0];
@@ -237,38 +242,33 @@ public class RetrofitController {
 
     private boolean createClasses(ProgressIndicator indicator) {
 
-        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
-        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
-        if (pkgRequest == null || pkgResponse == null){
+        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+        if (pkgRequest == null || pkgResponse == null) {
             //NotificationManager.get().integrationFailedNotification(project, errorMessage);
             return false;
         }
 
         indicator.setText("Creating request model classes");
         indicator.setFraction(0.4);
-        if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)){
+        if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)) {
             return false;
         }
         indicator.setText("Creating response model classes");
         indicator.setFraction(0.6);
-        if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)){
+        if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)) {
             return false;
         }
 
 
         //get retrofit directory
         PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageName);
-        if (pkg == null){
+        if (pkg == null) {
             return false;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        if (!createServiceClass(psiDirectory, indicator)){
-            return false;
-        }
-        if (!createManagerClass(psiDirectory, indicator)){
-            return false;
-        }
-        return true;
+        return createServiceClass(psiDirectory, indicator)
+                && createManagerClass(psiDirectory, indicator);
     }
 
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
