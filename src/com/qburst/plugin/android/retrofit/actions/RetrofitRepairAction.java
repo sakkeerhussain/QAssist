@@ -34,7 +34,6 @@ public class RetrofitRepairAction extends AnAction {
     @Override
     public void update(AnActionEvent e) {
         super.update(e);
-            e.getPresentation().setEnabled(false);
-
+        e.getPresentation().setEnabled(false);
     }
 }
