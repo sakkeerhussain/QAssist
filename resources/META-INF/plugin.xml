@@ -1,6 +1,6 @@
 <idea-plugin version="2">
-    <id>com.qburst.plugin.android</id>
-    <name>QBurst</name>
+    <id>com.qburst.plugins.android</id>
+    <name>QBurst Android Plugin</name>
     <version>1.0</version>
     <vendor email="sakkeer@qburst.com" url="http://www.qburst.com">QBurst</vendor>
 
@@ -10,13 +10,11 @@
     <depends>com.intellij.properties</depends>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+    This plugin is indented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only it can be be used to Integrate Retrofit to your project(for server communications).
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+     - Completed Retrofit integrator
     ]]>
     </change-notes>
 
