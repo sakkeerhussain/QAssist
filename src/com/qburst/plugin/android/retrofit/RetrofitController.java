@@ -317,7 +317,7 @@ public class RetrofitController {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
-            classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+            classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
             indicator.setText("Creating "+classModel.getName());
             if (!ClassManager.get().createClass(classModel)){
                 return false;
