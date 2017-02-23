@@ -266,11 +266,21 @@ public class Form2 {
     private String formatJson(String json) {
         json = json.trim();
         if (json.startsWith("{")) {
-            JSONObject jsonObject = new JSONObject(json);
-            return jsonObject.toString(4);
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                return jsonObject.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
         } else if (json.startsWith("[")) {
-            JSONArray jsonArray = new JSONArray(json);
-            return jsonArray.toString(4);
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                return jsonArray.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
         } else {
             return json;
         }
