@@ -34,6 +34,7 @@ public class RetrofitRepairAction extends AnAction {
     @Override
     public void update(AnActionEvent e) {
         super.update(e);
-        e.getPresentation().setEnabled(false);
+        boolean repairAvail = new RetrofitController().isAvailRepairRetrofitAction(e);
+        e.getPresentation().setEnabled(repairAvail);
     }
 }

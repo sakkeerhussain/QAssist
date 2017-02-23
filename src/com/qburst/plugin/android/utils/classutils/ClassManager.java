@@ -1,14 +1,13 @@
 package com.qburst.plugin.android.utils.classutils;
 
-import com.intellij.ide.util.DirectoryUtil;
-import com.intellij.openapi.externalSystem.model.project.ContentRootData;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.SourceFolder;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.psi.impl.file.PsiDirectoryImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.log.Log;
@@ -98,23 +97,31 @@ public class ClassManager {
         return null;
     }
 
-    public PsiJavaFileImpl isClassExists(String name, Project project, RetrofitController controller){
+    public VirtualFile isClassExists(String name, Project project, RetrofitController controller){
         for (Module module:ModuleManager.getInstance(project).getModules()){
             for (SourceFolder sourceRoot:controller.getSourceRoots(module)){
                 if (sourceRoot.getFile().isDirectory()){
-                    PsiDirectory dir = (PsiDirectory) sourceRoot.getFile();
-                    PsiJavaFileImpl managerClass = isClassExists(dir, name);
+                    VirtualFile managerClass = isClassExists(sourceRoot.getFile(), name);
                     if (managerClass != null){
                         return managerClass;
                     }
-                    for (PsiElement child:dir.getChildren()){
-                        Log.d("adad", child.toString());
-                        managerClass = isClassExists((PsiDirectory)child.getContainingFile(), name);
-                        if (managerClass != null){
-                            return managerClass;
-                        }
-                    }
                 }
+            }
+        }
+        return null;
+    }
+
+    private VirtualFile isClassExists(VirtualFile virtualFile, String name){
+        if (virtualFile.isDirectory()) {
+            for (VirtualFile child : virtualFile.getChildren()) {
+                VirtualFile classObj = isClassExists(child, name);
+                if (classObj != null) {
+                    return classObj;
+                }
+            }
+        }else {
+            if (virtualFile.getName().equals(name + ".java")) {
+                return virtualFile;
             }
         }
         return null;

@@ -51,6 +51,8 @@ import java.util.*;
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
 
+    private boolean repairMode;
+
     private Project project;
     private Module moduleSelected;
     private String baseUrl;
@@ -61,6 +63,7 @@ public class RetrofitController {
     public RetrofitController() {
         endPointDataModelList = new ArrayList<>();
         packageName = Constants.PACKAGE_NAME_RETROFIT;
+        repairMode = false;
     }
 
     private JFrame frame;
@@ -68,14 +71,20 @@ public class RetrofitController {
     private SourceFolder sourceFolderSelected;
 
     public void integrateRetrofitAction(AnActionEvent event) {
-        this.project = event.getData(PlatformDataKeys.PROJECT);
+        this.project = event.getProject();
         this.frame = new JFrame("Retrofit");
         openForm1();
     }
 
+    public boolean isAvailRepairRetrofitAction(AnActionEvent event) {
+        this.project = event.getProject();
+        return !(ClassManager.get().isClassExists("RetrofitManager", project, this) == null
+                && ClassManager.get().isClassExists("APIService", project, this) == null);
+    }
+
     public void repairRetrofitAction(AnActionEvent event) {
-        this.project = event.getData(PlatformDataKeys.PROJECT);
-        ClassManager.get().isClassExists("RetrofitManager", project, this);
+        repairMode = true;
+        integrateRetrofitAction(event);
     }
 
     public void openForm1(){
