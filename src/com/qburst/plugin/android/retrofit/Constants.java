@@ -16,7 +16,6 @@ public class Constants {
     public static final String DEPENDENCY_RETROFIT_GSON = "com.squareup.retrofit2:converter-gson:2.1.0";
     public static final String DEPENDENCY_RETROFIT_LOGGING = "com.squareup.okhttp3:logging-interceptor:3.2.0";
 
-    public static final String BASE_URL_FIELD = "private static final String BASE_URL = \"%s\";";
     public static final String GET_INSTANCE_METHOD = "public static APIService getInstance(final android.content.Context context) {\n" +
             "\n" +
             "        APIService service;\n" +
@@ -50,6 +49,10 @@ public class Constants {
             "        return service;\n" +
             "    }";
 
+    public class ManagerClass {
+        public static final String FIELD_BASE_URL = "BASE_URL";
+    }
+
     public class ServiceInterface {
         public static final String ANNOTATION_FORMAT = "@retrofit2.http.%s(\"%s\")";
         public static final String METHOD = "%s \n retrofit2.Call<%s> %s(%s);";
@@ -58,7 +61,7 @@ public class Constants {
         public static final String REQUEST_PARAM_BODY = "@retrofit2.http.Body %s %s, ";
     }
 
-    public class className{
+    public class ClassName {
         public static final String MANAGER = "RetrofitManager";
         public static final String SERVICE = "APIService";
     }

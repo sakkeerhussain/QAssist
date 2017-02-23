@@ -1,13 +1,11 @@
 package com.qburst.plugin.android.retrofit;
 
-import android.app.assist.AssistStructure;
 import com.android.tools.idea.gradle.parser.BuildFileKey;
 import com.android.tools.idea.gradle.parser.Dependency;
 import com.android.tools.idea.gradle.parser.GradleBuildFile;
 import com.android.tools.idea.gradle.parser.GradleSettingsFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -41,8 +39,6 @@ import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.util.*;
 
 /**
@@ -77,14 +73,34 @@ public class RetrofitController {
     }
 
     public boolean isAvailRepairRetrofitAction(AnActionEvent event) {
-        this.project = event.getProject();
-        return !(ClassManager.get().isClassExists("RetrofitManager", project, this) == null
-                && ClassManager.get().isClassExists("APIService", project, this) == null);
+        return !(ClassManager.get().isClassExists("RetrofitManager", event.getProject(), this) == null
+                && ClassManager.get().isClassExists("APIService", event.getProject(), this) == null);
     }
 
     public void repairRetrofitAction(AnActionEvent event) {
         repairMode = true;
+        project = event.getProject();
+        PsiClass managerClass = ClassManager.get().isClassExists(Constants.ClassName.MANAGER, project, this).getClasses()[0];
+        PsiClass serviceClass = ClassManager.get().isClassExists(Constants.ClassName.SERVICE, project, this).getClasses()[0];
+        readDataFromPreExistingClasses(managerClass, serviceClass);
         integrateRetrofitAction(event);
+    }
+
+    private void readDataFromPreExistingClasses(PsiClass managerClass, PsiClass serviceClass) {
+        moduleSelected = ClassManager.get().getContainingModule(managerClass);
+        packageName = managerClass.getQualifiedName().replace("."+managerClass.getName(), "");
+        baseUrl = (String) ClassManager.get().getFieldValue(Constants.ManagerClass.FIELD_BASE_URL, managerClass);
+        if (baseUrl == null) baseUrl = "";
+        PsiMethod[] methods = serviceClass.getMethods();
+        noOfEndPoints = methods.length;
+        for(int i = 0; i < noOfEndPoints; i++){
+            PsiMethod method = methods[i];
+            EndPointDataModel endPointDataModel = new EndPointDataModel();
+            endPointDataModel.setEndPointNo(i+1);
+            endPointDataModel.setCreateIgnoreModelClasses(true);
+            endPointDataModel.setEndPointName(method.getName());
+            endPointDataModelList.add(endPointDataModel);
+        }
     }
 
     public void openForm1(){
@@ -315,7 +331,7 @@ public class RetrofitController {
         //Creating service class
         indicator.setText("Creating service class");
         indicator.setFraction(0.8);
-        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.ClassName.SERVICE, ClassModel.Type.INTERFACE);
         classModel.setPackageName(packageName);
         for (int i = 0; i < noOfEndPoints; i++) {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
@@ -372,7 +388,7 @@ public class RetrofitController {
     private boolean createManagerClass(PsiDirectory psiDirectory, ProgressIndicator indicator) {
         indicator.setText("Creating manager class");
         indicator.setFraction(1.0);
-        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.ClassName.MANAGER, ClassModel.Type.CLASS);
         classModel.setPackageName(packageName);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
                 "String", "BASE_URL");
