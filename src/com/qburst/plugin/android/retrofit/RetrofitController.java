@@ -1,13 +1,11 @@
 package com.qburst.plugin.android.retrofit;
 
-import android.app.assist.AssistStructure;
 import com.android.tools.idea.gradle.parser.BuildFileKey;
 import com.android.tools.idea.gradle.parser.Dependency;
 import com.android.tools.idea.gradle.parser.GradleBuildFile;
 import com.android.tools.idea.gradle.parser.GradleSettingsFile;
 import com.android.tools.idea.gradle.project.GradleProjectImporter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
@@ -41,8 +39,6 @@ import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 
 import javax.swing.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.util.*;
 
 /**
@@ -50,6 +46,8 @@ import java.util.*;
  */
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
+
+    private boolean repairMode;
 
     private Project project;
     private Module moduleSelected;
@@ -61,6 +59,7 @@ public class RetrofitController {
     public RetrofitController() {
         endPointDataModelList = new ArrayList<>();
         packageName = Constants.PACKAGE_NAME_RETROFIT;
+        repairMode = false;
     }
 
     private JFrame frame;
@@ -68,9 +67,40 @@ public class RetrofitController {
     private SourceFolder sourceFolderSelected;
 
     public void integrateRetrofitAction(AnActionEvent event) {
-        this.project = event.getData(PlatformDataKeys.PROJECT);
+        this.project = event.getProject();
         this.frame = new JFrame("Retrofit");
         openForm1();
+    }
+
+    public boolean isAvailRepairRetrofitAction(AnActionEvent event) {
+        return !(ClassManager.get().isClassExists("RetrofitManager", event.getProject(), this) == null
+                && ClassManager.get().isClassExists("APIService", event.getProject(), this) == null);
+    }
+
+    public void repairRetrofitAction(AnActionEvent event) {
+        repairMode = true;
+        project = event.getProject();
+        PsiClass managerClass = ClassManager.get().isClassExists(Constants.ClassName.MANAGER, project, this).getClasses()[0];
+        PsiClass serviceClass = ClassManager.get().isClassExists(Constants.ClassName.SERVICE, project, this).getClasses()[0];
+        readDataFromPreExistingClasses(managerClass, serviceClass);
+        integrateRetrofitAction(event);
+    }
+
+    private void readDataFromPreExistingClasses(PsiClass managerClass, PsiClass serviceClass) {
+        moduleSelected = ClassManager.get().getContainingModule(managerClass);
+        packageName = managerClass.getQualifiedName().replace("."+managerClass.getName(), "");
+        baseUrl = (String) ClassManager.get().getFieldValue(Constants.ManagerClass.FIELD_BASE_URL, managerClass);
+        if (baseUrl == null) baseUrl = "";
+        PsiMethod[] methods = serviceClass.getMethods();
+        noOfEndPoints = methods.length;
+        for(int i = 0; i < noOfEndPoints; i++){
+            PsiMethod method = methods[i];
+            EndPointDataModel endPointDataModel = new EndPointDataModel();
+            endPointDataModel.setEndPointNo(i+1);
+            endPointDataModel.setCreateIgnoreModelClasses(true);
+            endPointDataModel.setEndPointName(method.getName());
+            endPointDataModelList.add(endPointDataModel);
+        }
     }
 
     public void openForm1(){
@@ -237,38 +267,33 @@ public class RetrofitController {
 
     private boolean createClasses(ProgressIndicator indicator) {
 
-        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
-        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
-        if (pkgRequest == null || pkgResponse == null){
+        PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+        PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+        if (pkgRequest == null || pkgResponse == null) {
             //NotificationManager.get().integrationFailedNotification(project, errorMessage);
             return false;
         }
 
         indicator.setText("Creating request model classes");
         indicator.setFraction(0.4);
-        if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)){
+        if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)) {
             return false;
         }
         indicator.setText("Creating response model classes");
         indicator.setFraction(0.6);
-        if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)){
+        if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)) {
             return false;
         }
 
 
         //get retrofit directory
-        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(Constants.PACKAGE_NAME_RETROFIT);
-        if (pkg == null){
+        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageName);
+        if (pkg == null) {
             return false;
         }
         PsiDirectory psiDirectory = pkg.getDirectories()[0];
-        if (!createServiceClass(psiDirectory, indicator)){
-            return false;
-        }
-        if (!createManagerClass(psiDirectory, indicator)){
-            return false;
-        }
-        return true;
+        return createServiceClass(psiDirectory, indicator)
+                && createManagerClass(psiDirectory, indicator);
     }
 
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
@@ -292,7 +317,7 @@ public class RetrofitController {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
-            classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+            classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
             indicator.setText("Creating "+classModel.getName());
             if (!ClassManager.get().createClass(classModel)){
                 return false;
@@ -306,8 +331,8 @@ public class RetrofitController {
         //Creating service class
         indicator.setText("Creating service class");
         indicator.setFraction(0.8);
-        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.SERVICE, ClassModel.Type.INTERFACE);
-        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.ClassName.SERVICE, ClassModel.Type.INTERFACE);
+        classModel.setPackageName(packageName);
         for (int i = 0; i < noOfEndPoints; i++) {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
 
@@ -363,8 +388,8 @@ public class RetrofitController {
     private boolean createManagerClass(PsiDirectory psiDirectory, ProgressIndicator indicator) {
         indicator.setText("Creating manager class");
         indicator.setFraction(1.0);
-        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.className.MANAGER, ClassModel.Type.CLASS);
-        classModel.setPackageName(Constants.PACKAGE_NAME_RETROFIT);
+        ClassModel classModel = new ClassModel(project, psiDirectory, Constants.ClassName.MANAGER, ClassModel.Type.CLASS);
+        classModel.setPackageName(packageName);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
                 "String", "BASE_URL");
         staticField.setValue(new StringUtils().getValueAsString(baseUrl));

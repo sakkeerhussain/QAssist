@@ -5,6 +5,7 @@ package com.qburst.plugin.android.retrofit;
  */
 public class EndPointDataModel {
     private int endPointNo;
+    private boolean createIgnoreModelClasses;
     private String endPointName;
     private String endPointUrl;
     private String method;
@@ -54,6 +55,10 @@ public class EndPointDataModel {
         return Constants.PACKAGE_NAME_RETROFIT_RESPONSE+"."+responseModelClassName;
     }
 
+    public boolean isCreateIgnoreModelClasses() {
+        return createIgnoreModelClasses;
+    }
+
     //setters
     public void setEndPointNo(int endPointNo) {
         this.endPointNo = endPointNo;
@@ -85,5 +90,9 @@ public class EndPointDataModel {
 
     public void setResponseModelClassName(String responseModelClassName) {
         this.responseModelClassName = responseModelClassName;
+    }
+
+    public void setCreateIgnoreModelClasses(boolean createIgnoreModelClasses) {
+        this.createIgnoreModelClasses = createIgnoreModelClasses;
     }
 }
