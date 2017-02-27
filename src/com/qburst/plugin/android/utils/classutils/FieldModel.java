@@ -23,7 +23,7 @@ public class FieldModel {
     protected ClassModel targetClass;
 
     public FieldModel(@NotNull ClassModel targetClass) {
-        this(targetClass, "public", false, false, null, null);
+        this(targetClass, "private", false, false, null, null);
     }
 
     public FieldModel(@NotNull ClassModel targetClass, String accessSpecifier,
