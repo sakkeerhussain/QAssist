@@ -23,7 +23,18 @@ public class ClassModel {
     private PsiDirectory directory;
     private List<FieldModel> fields;
     private List<PsiMethod> methods;
+    private List<MethodModel> methodModel;
     private List<ClassModel> subClasses;
+
+    public String getSuperClass() {
+        return superClass;
+    }
+
+    public void setSuperClass(String superClass) {
+        this.superClass = superClass;
+    }
+
+    private String superClass;
 
     //constructor
     public ClassModel(@NotNull Project project,
@@ -36,6 +47,7 @@ public class ClassModel {
         this.directory = directory;
         this.name = name;
         this.fields = new ArrayList<>();
+        this.methodModel = new ArrayList<>();
         this.methods = new ArrayList<>();
         this.subClasses = new ArrayList<>();
     }
@@ -47,6 +59,10 @@ public class ClassModel {
     }
 
     //methods
+    public void addAllMethods(List<MethodModel> fieldModelList){
+        this.methodModel.addAll(fieldModelList);
+    }
+
     public void addAllFields(List<FieldModel> fieldModelList){
         this.fields.addAll(fieldModelList);
     }
@@ -58,13 +74,15 @@ public class ClassModel {
     public void addField(FieldModel field) {
         this.fields.add(field);
     }
-
+    public void addMethod(MethodModel field) {
+        this.methodModel.add(field);
+        addMethod(methodModel.get(methodModel.size()-1).generateFieldText());
+    }
     public void addMethod(String methodString){
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(this.project);
         PsiMethod method = factory.createMethodFromText(methodString, directory);
         this.methods.add(method);
     }
-
     public boolean isSame(JSONObject o) {
         if (o == null) {
             return false;
@@ -86,13 +104,11 @@ public class ClassModel {
         }
         return same;
     }
-
     public PsiClass getPsiClassFromText(PsiClass parentClass) {
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
         String classStr = generateClassText();
         return factory.createClassFromText(classStr, parentClass).getInnerClasses()[0];
     }
-
     private String generateClassText() {
         StringBuilder fieldSb = new StringBuilder();
         fieldSb.append("public ");
@@ -102,7 +118,6 @@ public class ClassModel {
         fieldSb.append("{}");
         return fieldSb.toString();
     }
-
     public String getQualifiedName() {
         String fullClassName;
         if (!TextUtils.isEmpty(packageName)) {
@@ -113,7 +128,6 @@ public class ClassModel {
 
         return fullClassName;
     }
-
     //setters
     public void setName(String name){
         this.name = name;
