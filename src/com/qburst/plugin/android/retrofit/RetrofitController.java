@@ -23,9 +23,7 @@ import com.intellij.util.SmartList;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
 import com.qburst.plugin.android.retrofit.forms.Form3;
-import com.qburst.plugin.android.utils.classutils.ClassManager;
-import com.qburst.plugin.android.utils.classutils.ClassModel;
-import com.qburst.plugin.android.utils.classutils.FieldModel;
+import com.qburst.plugin.android.utils.classutils.*;
 import com.qburst.plugin.android.utils.http.HTTPUtils;
 import com.qburst.plugin.android.utils.http.UrlParamModel;
 import com.qburst.plugin.android.utils.log.Log;
@@ -302,14 +300,35 @@ public class RetrofitController {
                 return true;
             }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
-                    project, psiDirectoryRequest);
+             project, psiDirectoryRequest);
             indicator.setText("Creating "+classModel.getName());
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+            generateGetterAndSetterMethod(classModel);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
         }
         return true;
+    }
+
+    private void generateGetterAndSetterMethod(ClassModel classModel) {
+        List<FieldModel> fieldModels= classModel.getFields();
+        for(int i=0;i<fieldModels.size();i++){
+            FieldModel field = fieldModels.get(i);
+            String fieldName = field.getFieldName();
+            String fieldType = field.getType();
+            String getMethodName ="get"+new StringUtils().capitaliseFirstLetter(field.getFieldName());
+            String setMethodName = "set"+new StringUtils().capitaliseFirstLetter(field.getFieldName());
+            String getInnerContent = "return this."+fieldName+";";
+            String setInnerContent = "this."+fieldName+" = "+fieldName+";";
+            List<ParameterModel> parameterModels = new ArrayList<>();
+            ParameterModel parameterModel = new ParameterModel(fieldType,fieldName);
+            parameterModels.add(parameterModel);
+            MethodModel getMethod = new MethodModel(classModel,"private",false,fieldType,getMethodName,null,getInnerContent);
+            MethodModel setMethod = new MethodModel(classModel, "private", false,"void",setMethodName,parameterModels,setInnerContent);
+            classModel.addMethod(getMethod);
+            classModel.addMethod(setMethod);
+        }
     }
 
     private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse, ProgressIndicator indicator) {
@@ -319,6 +338,7 @@ public class RetrofitController {
                     project, psiDirectoryResponse);
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
             indicator.setText("Creating "+classModel.getName());
+            generateGetterAndSetterMethod(classModel);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -372,7 +392,6 @@ public class RetrofitController {
                     && requestParamsString.charAt(requestParamsString.length() - 2) == ',') {
                 requestParamsString = requestParamsString.substring(0, requestParamsString.length()-2);
             }
-
             String methodString = String.format(Constants.ServiceInterface.METHOD,
                     annotationString,
                     packageName + endPointData.getResponseModelClassName(),
