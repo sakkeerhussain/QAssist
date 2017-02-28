@@ -6,6 +6,10 @@ import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiField;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by qburst on 27/2/17.
  */
@@ -14,18 +18,25 @@ public class MethodModel {
     protected boolean isStatic;
     protected String returnType;
     protected String methodName;
+    protected String innerContent;
     protected ClassModel targetClass;
-    public MethodModel(@NotNull ClassModel targetClass) {
-        this(targetClass, "private", false, null, null);
-    }
+    protected List<ParameterModel> parameterModel;
+//    public MethodModel(@NotNull ClassModel targetClass) {
+//        this(targetClass, "private", false, null, null);
+//    }
     public MethodModel(@NotNull ClassModel targetClass, String accessSpecifier,
-                      boolean isStatic, String returnType, String methodName) {
+                      boolean isStatic, String returnType, String methodName,List<ParameterModel> parameterModel,String innerContent) {
+        this.parameterModel=  new ArrayList<>();
         this.targetClass = targetClass;
         this.isStatic = isStatic;
+        this.innerContent = innerContent;
         this.accessSpecifier = accessSpecifier;
         this.returnType = returnType;
         this.methodName = methodName;
+        this.parameterModel = parameterModel;
     }
+
+
     public PsiField getPsiField() {
         PsiElementFactory factory = JavaPsiFacade.getElementFactory(targetClass.getProject());
         String fieldStr = generateFieldText();
@@ -59,12 +70,19 @@ public class MethodModel {
             fieldSb.append("void").append(" ");
         }
         fieldSb.append(methodName);
-        fieldSb.append("(){}");
-
-//        fieldSb.append(";");
-//        if (comment != null) {
-//            fieldSb.append(" //").append(key).append(" = ").append(comment);
-//        }
+        fieldSb.append("(");
+        if(parameterModel!=null){
+            for (int i=0; i<parameterModel.size();i++) {
+                fieldSb.append(parameterModel.get(i).toString());
+                if(parameterModel.size()-1 > i){
+                    fieldSb.append(",");
+                }
+            }
+        };
+        fieldSb.append(")");
+        fieldSb.append("{");
+        fieldSb.append(innerContent);
+        fieldSb.append("}");
         return fieldSb.toString();
     }
 
