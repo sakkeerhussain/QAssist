@@ -14,7 +14,7 @@ public class Constants {
 
     public static final String DEPENDENCY_RETROFIT = "com.squareup.retrofit2:retrofit:2.1.0";
     public static final String DEPENDENCY_RETROFIT_GSON = "com.squareup.retrofit2:converter-gson:2.1.0";
-    public static final String DEPENDENCY_RETROFIT_LOGGING = "com.squareup.okhttp3:logging-interceptor:3.2.0";
+    public static final String DEPENDENCY_RETROFIT_LOGGING = "com.squareup.okhttp3:logging-interceptor:3.3.0";
 
     public static final String GET_INSTANCE_METHOD = "public static APIService getInstance(final android.content.Context context) {\n" +
             "\n" +
