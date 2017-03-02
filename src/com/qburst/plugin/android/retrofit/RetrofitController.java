@@ -35,6 +35,7 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
+import org.junit.platform.commons.util.AnnotationUtils;
 
 import javax.swing.*;
 import java.util.*;
@@ -97,6 +98,12 @@ public class RetrofitController {
             endPointDataModel.setEndPointNo(i+1);
             endPointDataModel.setCreateIgnoreModelClasses(true);
             endPointDataModel.setEndPointName(method.getName());
+
+            String httpMethod = method.getModifierList().getAnnotations()[0].getNameReferenceElement().getText();
+            endPointDataModel.setMethod(httpMethod);
+
+            //AnnotationUtils.findAnnotation(method, AnnotationUtils.ALL_ANNOTATIONS);
+
             endPointDataModelList.add(endPointDataModel);
         }
     }
