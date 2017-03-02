@@ -146,10 +146,6 @@ public class ClassModel {
     }
 
     //getters
-    public String getFullName() {
-        // TODO: 06/02/17 return package name toooo
-        return name;
-    }
     public String getName() {
         return name;
     }

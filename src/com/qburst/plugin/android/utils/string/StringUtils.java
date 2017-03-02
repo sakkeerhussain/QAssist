@@ -5,14 +5,14 @@ package com.qburst.plugin.android.utils.string;
  */
 public class StringUtils {
 
-    public String lowersFirstLetter(String str){
+    public static String lowersFirstLetter(String str){
         if (str.length()<1){
             return str;
         }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
-    public String capitaliseFirstLetter(String str){
+    public static String capitaliseFirstLetter(String str){
         if (str.length()<1){
             return str;
         }
@@ -30,7 +30,17 @@ public class StringUtils {
         return result;
     }
 
-    public String getValueAsString(String str){
+    public static String getValueAsString(String str){
         return "\""+str+"\"";
+    }
+
+    public static String getUnwrapStringValue(String str){
+        if (str.startsWith("\"")){
+            str = str.substring(1);
+        }
+        if (str.endsWith("\"")){
+            str = str.substring(0, str.length()-1);
+        }
+        return str;
     }
 }

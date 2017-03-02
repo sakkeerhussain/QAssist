@@ -29,7 +29,6 @@ public class JsonManager {
 
     public ClassModel getRequestClassModel(EndPointDataModel endPointDataModel, @NotNull Project project, @NotNull PsiDirectory directory) {
         String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_REQUEST_MODEL});
-        endPointDataModel.setRequestModelClassName(name);
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
         parseJson(endPointDataModel.getRequestModel(), classModel);
         return classModel;
@@ -37,7 +36,6 @@ public class JsonManager {
 
     public ClassModel getResponseClassModel(EndPointDataModel endPointDataModel, Project project, PsiDirectory directory) {
         String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_RESPONSE_MODEL});
-        endPointDataModel.setResponseModelClassName(name);
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
         parseJson(endPointDataModel.getResponseModel(), classModel);
         return classModel;

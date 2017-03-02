@@ -24,7 +24,7 @@ public class UrlStringUtil {
         }
     }
 
-    private String getParamsRemovedUrl(String url){
+    private static String getParamsRemovedUrl(String url){
         int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex != -1){
             return url.substring(0, questionMarkIndex);
@@ -67,7 +67,7 @@ public class UrlStringUtil {
         return result;
     }
 
-    public String getPrettyUrl(String url) {
+    public static String getPrettyUrl(String url) {
         String paramsRemovedUrl =  getParamsRemovedUrl(url);
         Matcher matcher = Pattern.compile(Const.PATH_PARAM_REGEX).matcher(paramsRemovedUrl);
         while(matcher.find()) {

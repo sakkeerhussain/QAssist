@@ -28,6 +28,7 @@ import com.qburst.plugin.android.utils.http.HTTPUtils;
 import com.qburst.plugin.android.utils.http.UrlParamModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
+import com.qburst.plugin.android.utils.string.ClassStringUtil;
 import com.qburst.plugin.android.utils.string.StringUtils;
 import com.qburst.plugin.android.utils.string.UrlStringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,7 @@ public class RetrofitController {
     private String packageName;
     private int noOfEndPoints;
     private List<EndPointDataModel> endPointDataModelList;
+    private boolean gradleFileChanged;
 
     public RetrofitController() {
         endPointDataModelList = new ArrayList<>();
@@ -99,10 +101,15 @@ public class RetrofitController {
             endPointDataModel.setCreateIgnoreModelClasses(true);
             endPointDataModel.setEndPointName(method.getName());
 
-            String httpMethod = method.getModifierList().getAnnotations()[0].getNameReferenceElement().getText();
+            // TODO: 02/03/17 handle no annotation case
+            PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+            String httpMethod = annotation.getQualifiedName();
+            httpMethod = ClassStringUtil.getClassNameFromQualified(httpMethod);
             endPointDataModel.setMethod(httpMethod);
 
-            //AnnotationUtils.findAnnotation(method, AnnotationUtils.ALL_ANNOTATIONS);
+            String endPointUrl = StringUtils.getUnwrapStringValue(annotation.getParameterList().getAttributes()[0].getValue().getText());
+            // TODO: 02/03/17 provide dummy data for path params and add query params in url
+            endPointDataModel.setEndPointUrl(endPointUrl);
 
             endPointDataModelList.add(endPointDataModel);
         }
@@ -200,7 +207,11 @@ public class RetrofitController {
 
                     if (errorMessage == null) {
                         NotificationManager.get().integrationCompletedNotification(project);
-                        ApplicationManager.getApplication().invokeLater(() -> GradleProjectImporter.getInstance().requestProjectSync(project, null));
+                        if (gradleFileChanged){
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                GradleProjectImporter.getInstance().requestProjectSync(project, null);
+                            });
+                        }
                     } else {
                         NotificationManager.get().integrationFailedNotification(project, errorMessage);
                     }
@@ -222,30 +233,30 @@ public class RetrofitController {
         List<Dependency> value = (List<Dependency>)buildFile.getValue(BuildFileKey.DEPENDENCIES);
         final List<Dependency> dependencies = value != null ? value : new ArrayList<Dependency>();
 
-        boolean added = false;
+        gradleFileChanged = false;
         //new MavenArtifact
         Dependency retrofit = new Dependency(Dependency.Scope.COMPILE,
                 Dependency.Type.EXTERNAL,
                 Constants.DEPENDENCY_RETROFIT);
         if (!dependencies.contains(retrofit)) {
             dependencies.add((retrofit));
-            added = true;
+            gradleFileChanged = true;
         }
         Dependency retrofitGson = new Dependency(Dependency.Scope.COMPILE,
                 Dependency.Type.EXTERNAL,
                 Constants.DEPENDENCY_RETROFIT_GSON);
         if (!dependencies.contains(retrofitGson)) {
             dependencies.add((retrofitGson));
-            added = true;
+            gradleFileChanged = true;
         }
         Dependency retrofitLogging = new Dependency(Dependency.Scope.COMPILE,
                 Dependency.Type.EXTERNAL,
                 Constants.DEPENDENCY_RETROFIT_LOGGING);
         if (!dependencies.contains(retrofitLogging)) {
             dependencies.add((retrofitLogging));
-            added = true;
+            gradleFileChanged = true;
         }
-        if (added) {
+        if (gradleFileChanged) {
             buildFile.setValue(BuildFileKey.DEPENDENCIES, dependencies);
         }
         return true;
@@ -265,9 +276,7 @@ public class RetrofitController {
         VirtualFile modelDir = directoryManager.createDirectory(dir, "model");
         if (modelDir == null){ return false; }
         if (directoryManager.createDirectory(modelDir, "request") == null){ return false; }
-        if (directoryManager.createDirectory(modelDir, "response") == null){ return false; }
-
-        return true;
+        return directoryManager.createDirectory(modelDir, "response") != null;
     }
 
     private boolean createClasses(ProgressIndicator indicator) {
@@ -307,9 +316,10 @@ public class RetrofitController {
                 return true;
             }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
-             project, psiDirectoryRequest);
+                    project, psiDirectoryRequest);
             indicator.setText("Creating "+classModel.getName());
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
+            endPointDataModel.setRequestModelClassName(classModel.getQualifiedName());
             generateGetterAndSetterMethod(classModel);
             if (!ClassManager.get().createClass(classModel)){
                 return false;
@@ -320,19 +330,18 @@ public class RetrofitController {
 
     private void generateGetterAndSetterMethod(ClassModel classModel) {
         List<FieldModel> fieldModels= classModel.getFields();
-        for(int i=0;i<fieldModels.size();i++){
-            FieldModel field = fieldModels.get(i);
+        for (FieldModel field : fieldModels) {
             String fieldName = field.getFieldName();
             String fieldType = field.getType();
-            String getMethodName ="get"+new StringUtils().capitaliseFirstLetter(field.getFieldName());
-            String setMethodName = "set"+new StringUtils().capitaliseFirstLetter(field.getFieldName());
-            String getInnerContent = "return this."+fieldName+";";
-            String setInnerContent = "this."+fieldName+" = "+fieldName+";";
+            String getMethodName = "get" + StringUtils.capitaliseFirstLetter(field.getFieldName());
+            String setMethodName = "set" + StringUtils.capitaliseFirstLetter(field.getFieldName());
+            String getInnerContent = "return this." + fieldName + ";";
+            String setInnerContent = "this." + fieldName + " = " + fieldName + ";";
             List<ParameterModel> parameterModels = new ArrayList<>();
-            ParameterModel parameterModel = new ParameterModel(fieldType,fieldName);
+            ParameterModel parameterModel = new ParameterModel(fieldType, fieldName);
             parameterModels.add(parameterModel);
-            MethodModel getMethod = new MethodModel(classModel,"private",false,fieldType,getMethodName,null,getInnerContent);
-            MethodModel setMethod = new MethodModel(classModel, "private", false,"void",setMethodName,parameterModels,setInnerContent);
+            MethodModel getMethod = new MethodModel(classModel, "private", false, fieldType, getMethodName, null, getInnerContent);
+            MethodModel setMethod = new MethodModel(classModel, "private", false, "void", setMethodName, parameterModels, setInnerContent);
             classModel.addMethod(getMethod);
             classModel.addMethod(setMethod);
         }
@@ -344,6 +353,7 @@ public class RetrofitController {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
+            endPointDataModel.setResponseModelClassName(classModel.getQualifiedName());
             indicator.setText("Creating "+classModel.getName());
             generateGetterAndSetterMethod(classModel);
             if (!ClassManager.get().createClass(classModel)){
@@ -364,15 +374,16 @@ public class RetrofitController {
             EndPointDataModel endPointData = endPointDataModelList.get(i);
 
             String url = endPointData.getEndPointUrl();
-            String prettyUrl = new UrlStringUtil().getPrettyUrl(url);
+            String prettyUrl = UrlStringUtil.getPrettyUrl(url);
 
             String annotationString = String.format(Constants.ServiceInterface.ANNOTATION_FORMAT,
                     endPointData.getMethod(), prettyUrl);
 
             String requestParamsString = "";
-            String requestClassName = endPointData.getSimpleRequestModelClassName();
+            String requestClassName = endPointData.getRequestModelClassName();
             if (requestClassName != null && !requestClassName.equals("")) {
-                String requestClassObjName = new StringUtils().lowersFirstLetter(requestClassName);
+                String requestClassObjName =  ClassStringUtil.getClassNameFromQualified(requestClassName);
+                requestClassObjName = StringUtils.lowersFirstLetter(requestClassObjName);
                 String reqBodyStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_BODY,
                         requestClassName,
                         requestClassObjName);
@@ -401,7 +412,7 @@ public class RetrofitController {
             }
             String methodString = String.format(Constants.ServiceInterface.METHOD,
                     annotationString,
-                    packageName + endPointData.getResponseModelClassName(),
+                    endPointData.getResponseModelClassName(),
                     endPointData.getEndPointName(),
                     requestParamsString);
 
@@ -418,7 +429,7 @@ public class RetrofitController {
         classModel.setPackageName(packageName);
         FieldModel staticField = new FieldModel(classModel, "private", true, true,
                 "String", "BASE_URL");
-        staticField.setValue(new StringUtils().getValueAsString(baseUrl));
+        staticField.setValue(StringUtils.getValueAsString(baseUrl));
         classModel.addField(staticField);
         classModel.addMethod(Constants.GET_INSTANCE_METHOD);
         return ClassManager.get().createClass(classModel);

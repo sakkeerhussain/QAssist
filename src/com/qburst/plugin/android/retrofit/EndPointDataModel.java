@@ -47,12 +47,12 @@ public class EndPointDataModel {
         return endPointName;
     }
 
-    public String getSimpleRequestModelClassName() {
+    public String getRequestModelClassName() {
         return requestModelClassName;
     }
 
     public String getResponseModelClassName() {
-        return Constants.PACKAGE_NAME_RETROFIT_RESPONSE+"."+responseModelClassName;
+        return responseModelClassName;
     }
 
     public boolean isCreateIgnoreModelClasses() {
