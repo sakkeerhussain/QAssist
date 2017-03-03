@@ -109,6 +109,7 @@ public class RetrofitController {
 
             String endPointUrl = StringUtils.getUnwrapStringValue(annotation.getParameterList().getAttributes()[0].getValue().getText());
             // TODO: 02/03/17 provide dummy data for path params and add query params in url
+            endPointUrl = UrlStringUtil.getUrlWithDummyData(endPointUrl, method.getParameterList());
             endPointDataModel.setEndPointUrl(endPointUrl);
 
             endPointDataModelList.add(endPointDataModel);
@@ -390,19 +391,19 @@ public class RetrofitController {
                 requestParamsString = requestParamsString.concat(reqBodyStr);
             }
 
-            List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(url);
+            List<UrlParamModel> pathParams = UrlStringUtil.getListOfPathParams(url);
             for (UrlParamModel pathParam:pathParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_PATH,
                         pathParam.getKey(), new UrlStringUtil().getParamType(pathParam.getValue()),
-                        new StringUtils().lowersFirstLetter(pathParam.getKey()));
+                        StringUtils.lowersFirstLetter(pathParam.getKey()));
                 requestParamsString = requestParamsString.concat(reqQueryStr);
             }
 
-            List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(url);
+            List<UrlParamModel> queryParams = UrlStringUtil.getListOfQueryParams(url);
             for (UrlParamModel queryParam:queryParams){
                 String reqQueryStr = String.format(Constants.ServiceInterface.REQUEST_PARAM_QUERY,
                         queryParam.getKey(), new UrlStringUtil().getParamType(queryParam.getValue()),
-                        new StringUtils().lowersFirstLetter(queryParam.getKey()));
+                        StringUtils.lowersFirstLetter(queryParam.getKey()));
                 requestParamsString = requestParamsString.concat(reqQueryStr);
             }
             if (requestParamsString.length() > 1

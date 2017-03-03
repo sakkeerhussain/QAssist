@@ -55,7 +55,6 @@ public class Form2 {
     private void addToolTipText() {
         endPointUrlTextField.setToolTipText("\"<html>Enter you end point URL with path parameters inside curly bracket with sample value<br/>(Eg: test/{id=4}/details/).<br/><br/>If you have list as value, then give values within a square bracket and have sample values as comma separated<br/>(Eg: names/[\\\"name_1\\\", \\\"name_2\\\"]/save/).<br/><br/> Include your query parameters after a '?' mark with separated '&' symbol<br/>(Eg: url/?key1=value1&key2=value2&field3=value3\\\"</html>\"");
         urlHelpButton.setToolTipText("\"<html>Enter you end point URL with path parameters inside curly bracket with sample value<br/>(Eg: test/{id=4}/details/).<br/><br/>If you have list as value, then give values within a square bracket and have sample values as comma separated<br/>(Eg: names/[\\\"name_1\\\", \\\"name_2\\\"]/save/).<br/><br/> Include your query parameters after a '?' mark with separated '&' symbol<br/>(Eg: url/?key1=value1&key2=value2&field3=value3\\\"</html>\"");
-
     }
 
     private void addActionListener() {
@@ -206,9 +205,9 @@ public class Form2 {
             errorLabel.setText("End point URL is not in valid format");
             return false;
         }
-        if(!Objects.equals(checkForKeyRepeatation(), null))
+        if(!Objects.equals(checkForKeyRepetition(), null))
         {
-            errorLabel.setText(checkForKeyRepeatation());
+            errorLabel.setText(checkForKeyRepetition());
             return false;
         }
         if (!new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
@@ -239,28 +238,25 @@ public class Form2 {
         return true;
 
     }
-    private String checkForKeyRepeatation() {
-        List<UrlParamModel> queryParams = new UrlStringUtil().getListOfQueryParams(endPointUrlTextField.getText());
-        List<UrlParamModel> pathParams = new UrlStringUtil().getListOfPathParams(endPointUrlTextField.getText());
+
+    private String checkForKeyRepetition() {
+        List<UrlParamModel> queryParams = UrlStringUtil.getListOfQueryParams(endPointUrlTextField.getText());
+        List<UrlParamModel> pathParams = UrlStringUtil.getListOfPathParams(endPointUrlTextField.getText());
         List<String> keys = new ArrayList<String>();
-        for(int i=0;i<queryParams.size();i++)
-        {
-            keys.add( queryParams.get(i).getKey());
+        for (UrlParamModel queryParam : queryParams) {
+            keys.add(queryParam.getKey());
         }
-        for(int i=0;i<pathParams.size();i++)
-        {
-            keys.add(pathParams.get(i).getKey());
+        for (UrlParamModel pathParam : pathParams) {
+            keys.add(pathParam.getKey());
         }
-        for(int i=0;i<keys.size();i++)
-        {
-            for(int j=i+1;j<keys.size();j++)
-            {
+        for(int i=0;i<keys.size();i++) {
+            for(int j=i+1;j<keys.size();j++) {
                 if(keys.get(i).equals(keys.get(j))) {
-                   return "Key \'"+keys.get(j)+"\' is repeated";
+                    return "Key \'"+keys.get(j)+"\' is repeated";
                 }
             }
         }
-      return null;
+        return null;
     }
 
     private String formatJson(String json) {

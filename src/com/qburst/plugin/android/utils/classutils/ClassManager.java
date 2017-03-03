@@ -166,4 +166,18 @@ public class ClassManager {
 //        }
 //        return null;
 //    }
+
+    public String getDummyDataOfType(PsiType type){
+        if (type.equalsToText(CommonClassNames.JAVA_LANG_STRING)){
+            return "dummyStr";
+        }else if (type.equalsToText(CommonClassNames.JAVA_LANG_INTEGER) || type.equalsToText("int")){
+            return "1";
+        }else if (type.equalsToText(CommonClassNames.JAVA_LANG_FLOAT) || type.equalsToText("float")){
+            return "1.1";
+        }else  if (type.equalsToText(CommonClassNames.JAVA_LANG_DOUBLE) || type.equalsToText("double")){
+            return "1.1111111111";
+        }else {
+            return "";
+        }
+    }
 }

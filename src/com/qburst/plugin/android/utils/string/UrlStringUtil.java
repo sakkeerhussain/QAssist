@@ -1,8 +1,13 @@
 package com.qburst.plugin.android.utils.string;
 
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
+import com.qburst.plugin.android.utils.classutils.ClassManager;
 import com.qburst.plugin.android.utils.classutils.DataType;
 import com.qburst.plugin.android.utils.http.UrlParamModel;
 
+import javax.lang.model.element.TypeElement;
 import javax.print.attribute.standard.JobStateReasons;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class UrlStringUtil {
 
-    public String getParamsPartOfUrl(String url){
+    public static String getParamsPartOfUrl(String url){
         int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex != -1){
             return url.substring(questionMarkIndex+1);
@@ -33,7 +38,7 @@ public class UrlStringUtil {
         }
     }
 
-    public List<UrlParamModel> getListOfQueryParams(String url){
+    public static List<UrlParamModel> getListOfQueryParams(String url){
         String paramsPart = getParamsPartOfUrl(url);
         Matcher matcher = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*)=[^&=]+").matcher(paramsPart);
         List<UrlParamModel> result = new ArrayList<>();
@@ -50,7 +55,7 @@ public class UrlStringUtil {
         return result;
     }
 
-    public List<UrlParamModel> getListOfPathParams(String url){
+    public static List<UrlParamModel> getListOfPathParams(String url){
         String initialPartOfUrl = getParamsRemovedUrl(url);
         Matcher matcher = Pattern.compile(Const.PATH_PARAM_REGEX).matcher(initialPartOfUrl);
         List<UrlParamModel> result = new ArrayList<>();
@@ -76,6 +81,31 @@ public class UrlStringUtil {
             paramsRemovedUrl = paramsRemovedUrl.replace(matchedString, queryKeyWithinBraces);
         }
         return paramsRemovedUrl;
+    }
+
+    public static String getUrlWithDummyData(String prettyUrl, PsiParameterList parameterList) {
+        String url =  getParamsRemovedUrl(prettyUrl);
+        String paramsPart = "";
+        for(PsiParameter param: parameterList.getParameters()) {
+            PsiAnnotation annotation = param.getModifierList().getAnnotations()[0];
+            String paramType = annotation.getQualifiedName();
+            if (Const.Retrofit.PATH.equals(paramType)) {
+                String keyName = annotation.getParameterList().getAttributes()[0].getLiteralValue();
+                String dummyData = ClassManager.get().getDummyDataOfType(param.getType());
+                String queryWithDummyDataWithinBraces = "{".concat(keyName).concat("=").concat(dummyData).concat("}");
+                String queryText = "{".concat(keyName).concat("}");
+                url = url.replace(queryText, queryWithDummyDataWithinBraces);
+            } else if (paramType.equals(Const.Retrofit.QUERY)) {
+                String keyName = annotation.getParameterList().getAttributes()[0].getLiteralValue();
+                String dummyData = ClassManager.get().getDummyDataOfType(param.getType());
+                String query = "&".concat(keyName).concat("=").concat(dummyData);
+                paramsPart = paramsPart.concat(query);
+            }
+        }
+        if (!"".equals(paramsPart)){
+            url = url.concat("?").concat(paramsPart.substring(1));
+        }
+        return url;
     }
 
     public String getParamType(String value) {
