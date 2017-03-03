@@ -20,4 +20,9 @@ public class ClassStringUtil {
             return "";
         }
     }
+
+    public static String getCamelCaseFromUnderScore(String underScoreName){
+        String[] strings = underScoreName.split("_");
+        return StringUtils.capitaliseFirstLetter(strings);
+    }
 }

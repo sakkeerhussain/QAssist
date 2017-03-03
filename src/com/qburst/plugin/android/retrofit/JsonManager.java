@@ -6,6 +6,7 @@ import com.qburst.plugin.android.utils.classutils.ClassModel;
 import com.qburst.plugin.android.utils.classutils.DataType;
 import com.qburst.plugin.android.utils.classutils.FieldModel;
 import com.qburst.plugin.android.utils.classutils.IterableFieldModel;
+import com.qburst.plugin.android.utils.string.ClassStringUtil;
 import com.qburst.plugin.android.utils.string.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
@@ -28,14 +29,15 @@ public class JsonManager {
     }
 
     public ClassModel getRequestClassModel(EndPointDataModel endPointDataModel, @NotNull Project project, @NotNull PsiDirectory directory) {
-        String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_REQUEST_MODEL});
+        String name = StringUtils.capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_REQUEST_MODEL});
+        endPointDataModel.setRequestModelClassName(name);
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
         parseJson(endPointDataModel.getRequestModel(), classModel);
         return classModel;
     }
 
     public ClassModel getResponseClassModel(EndPointDataModel endPointDataModel, Project project, PsiDirectory directory) {
-        String name = new StringUtils().capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_RESPONSE_MODEL});
+        String name = StringUtils.capitaliseFirstLetter(new String[]{endPointDataModel.getEndPointName(), Constants.STRING_RESPONSE_MODEL});
         ClassModel classModel = new ClassModel(project, directory, name, ClassModel.Type.CLASS);
         parseJson(endPointDataModel.getResponseModel(), classModel);
         return classModel;
@@ -265,8 +267,7 @@ public class JsonManager {
             if (TextUtils.isEmpty(key)) {
                 return key;
             }
-            String[] strings = key.split("_");
-            name = new StringUtils().capitaliseFirstLetter(strings);
+            name = ClassStringUtil.getCamelCaseFromUnderScore(key);
         }
         return name+Constants.STRING_MODEL;
 

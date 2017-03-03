@@ -19,7 +19,7 @@ public class StringUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public String capitaliseFirstLetter(String[] strs){
+    public static String capitaliseFirstLetter(String[] strs){
         if (strs.length < 1){
             return "";
         }
