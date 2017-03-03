@@ -5,7 +5,7 @@ package com.qburst.plugin.android.utils.http;
  */
 public class HTTPUtils {
 
-    public boolean isPayloadNotSupportingMethod(String method) {
+    public static boolean isPayloadNotSupportingMethod(String method) {
         return ("GET".equals(method)
                 || "DELETE".equals(method)
                 || "HEAD".equals(method)

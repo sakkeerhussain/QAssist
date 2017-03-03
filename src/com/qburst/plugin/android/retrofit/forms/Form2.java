@@ -116,7 +116,7 @@ public class Form2 {
         methodChooserComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
+                if(HTTPUtils.isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString()))
                 {
                     if(flag)
                         validData();
@@ -210,7 +210,7 @@ public class Form2 {
             errorLabel.setText(checkForKeyRepetition());
             return false;
         }
-        if (!new HTTPUtils().isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
+        if (!HTTPUtils.isPayloadNotSupportingMethod(methodChooserComboBox.getSelectedItem().toString())) {
             if (requestModelTextArea.getText().isEmpty()) {
                 errorLabel.setText("Request model is empty");
                 return false;

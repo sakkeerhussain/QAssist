@@ -313,7 +313,7 @@ public class RetrofitController {
 
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
-            if (new HTTPUtils().isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
+            if (HTTPUtils.isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
                 return true;
             }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
