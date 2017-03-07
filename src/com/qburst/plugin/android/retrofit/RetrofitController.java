@@ -19,6 +19,10 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.SourceFolderImpl;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.PsiClassImplUtil;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.util.PsiClassUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.SmartList;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
@@ -108,9 +112,12 @@ public class RetrofitController {
             endPointDataModel.setMethod(httpMethod);
 
             String endPointUrl = StringUtils.getUnwrapStringValue(annotation.getParameterList().getAttributes()[0].getValue().getText());
-            // TODO: 02/03/17 provide dummy data for path params and add query params in url
             endPointUrl = UrlStringUtil.getUrlWithDummyData(endPointUrl, method.getParameterList());
             endPointDataModel.setEndPointUrl(endPointUrl);
+
+            PsiType responseClassType = ((PsiClassReferenceType) method.getReturnType()).getParameters()[0];
+            endPointDataModel.setResponseModel(JsonManager.getJsonFromPsiClass(responseClassType));
+            endPointDataModel.setResponseModelClassName(responseClassType.getCanonicalText());
 
             endPointDataModelList.add(endPointDataModel);
         }

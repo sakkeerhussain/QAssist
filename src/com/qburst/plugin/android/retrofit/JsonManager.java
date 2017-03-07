@@ -1,11 +1,10 @@
 package com.qburst.plugin.android.retrofit;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.qburst.plugin.android.utils.classutils.ClassModel;
-import com.qburst.plugin.android.utils.classutils.DataType;
-import com.qburst.plugin.android.utils.classutils.FieldModel;
-import com.qburst.plugin.android.utils.classutils.IterableFieldModel;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.util.PsiTypesUtil;
+import com.qburst.plugin.android.utils.classutils.*;
 import com.qburst.plugin.android.utils.string.ClassStringUtil;
 import com.qburst.plugin.android.utils.string.StringUtils;
 import org.apache.http.util.TextUtils;
@@ -288,5 +287,30 @@ public class JsonManager {
         if (false) {
             handleDeclareClassName(className, "X");
         }
+    }
+
+
+    /*
+    * Class to Json
+    */
+    public static String getJsonFromPsiClass(PsiType psiClassType){
+        PsiClass psiClass = PsiTypesUtil.getPsiClass(psiClassType);
+        String json = "{\n";
+        for (PsiField field : psiClass.getFields()) {
+            PsiType type = field.getType();
+            String value = ClassManager.get().getDummyDataOfType(type);
+            if ("".equals(value)){
+                value = getJsonFromPsiClass(type);
+            }else {
+                value = StringUtils.getValueAsString(value);
+            }
+
+            json = json.concat("\"")
+                    .concat(field.getNameIdentifier().getText())
+                    .concat("\":")
+                    .concat(value)
+                    .concat(",\n");
+        }
+        return json.substring(0, json.length()-2) + "}";
     }
 }
