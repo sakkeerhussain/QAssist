@@ -10,6 +10,7 @@ import com.qburst.plugin.android.utils.string.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -311,6 +312,58 @@ public class JsonManager {
                     .concat(value)
                     .concat(",\n");
         }
-        return json.substring(0, json.length()-2) + "}";
+        json = json.substring(0, json.length()-2) + "}";
+        if (JsonManager.isValidJson(json)){
+            return JsonManager.formatJson(json);
+        }else {
+            return "";
+        }
+    }
+
+    /*
+    * Utils
+    */
+    public static boolean isValidJson(String json) {
+        json = json.trim();
+        if (json.startsWith("{")) {
+            try {
+                new JSONObject(json);
+                return true;
+            }catch (JSONException e){
+                return false;
+            }
+        } else if (json.startsWith("[")) {
+            try {
+                new JSONArray(json);
+                return true;
+            }catch (JSONException e){
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public static String formatJson(String json) {
+        json = json.trim();
+        if (json.startsWith("{")) {
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                return jsonObject.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
+        } else if (json.startsWith("[")) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                return jsonArray.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
+        } else {
+            return json;
+        }
     }
 }
