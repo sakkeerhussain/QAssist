@@ -296,7 +296,7 @@ public class JsonManager {
     */
     public static String getJsonFromPsiClass(PsiType psiClassType){
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiClassType);
-        String json = "{\n";
+        String json = "{";
         for (PsiField field : psiClass.getFields()) {
             PsiType type = field.getType();
             String value = ClassManager.get().getDummyDataOfType(type, true);
@@ -304,13 +304,23 @@ public class JsonManager {
                 value = getJsonFromPsiClass(type);
             }
 
+            String jsonFieldName = field.getNameIdentifier().getText();
+            for (PsiAnnotation psiAnnotation : field.getModifierList().getAnnotations()) {
+                if (Constants.ClassName.SerializedName.equals(psiAnnotation.getQualifiedName())){
+                    PsiNameValuePair[] attributes = psiAnnotation.getParameterList().getAttributes();
+                    if (attributes.length > 0) {
+                        jsonFieldName = attributes[0].getLiteralValue();
+                    }
+                }
+            }
+
             json = json.concat("\"")
-                    .concat(field.getNameIdentifier().getText())
+                    .concat(jsonFieldName)
                     .concat("\":")
                     .concat(value)
-                    .concat(",\n");
+                    .concat(",");
         }
-        json = json.substring(0, json.length()-2) + "}";
+        json = json.substring(0, json.length()-1) + "}";
         if (JsonManager.isValidJson(json)){
             return JsonManager.formatJson(json);
         }else {

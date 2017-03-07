@@ -33,6 +33,7 @@ import com.qburst.plugin.android.utils.http.UrlParamModel;
 import com.qburst.plugin.android.utils.log.Log;
 import com.qburst.plugin.android.utils.notification.NotificationManager;
 import com.qburst.plugin.android.utils.string.ClassStringUtil;
+import com.qburst.plugin.android.utils.string.Const;
 import com.qburst.plugin.android.utils.string.StringUtils;
 import com.qburst.plugin.android.utils.string.UrlStringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -118,6 +119,17 @@ public class RetrofitController {
             PsiType responseClassType = ((PsiClassReferenceType) method.getReturnType()).getParameters()[0];
             endPointDataModel.setResponseModel(JsonManager.getJsonFromPsiClass(responseClassType));
             endPointDataModel.setResponseModelClassName(responseClassType.getCanonicalText());
+
+            for (PsiParameter psiParameter: method.getParameterList().getParameters()){
+                Log.d("PsiParameter", psiParameter.getText());
+                PsiAnnotation psiParameterAnnotation = psiParameter.getModifierList().getAnnotations()[0];
+                String paramType = psiParameterAnnotation.getQualifiedName();
+                if (Const.Retrofit.BODY.equals(paramType)) {
+                    PsiType requestClassType = psiParameter.getType();
+                    endPointDataModel.setRequestModel(JsonManager.getJsonFromPsiClass(requestClassType));
+                    endPointDataModel.setRequestModelClassName(requestClassType.getCanonicalText());
+                }
+            }
 
             endPointDataModelList.add(endPointDataModel);
         }
