@@ -91,13 +91,13 @@ public class UrlStringUtil {
             String paramType = annotation.getQualifiedName();
             if (Const.Retrofit.PATH.equals(paramType)) {
                 String keyName = annotation.getParameterList().getAttributes()[0].getLiteralValue();
-                String dummyData = ClassManager.get().getDummyDataOfType(param.getType());
+                String dummyData = ClassManager.get().getDummyDataOfType(param.getType(), false);
                 String queryWithDummyDataWithinBraces = "{".concat(keyName).concat("=").concat(dummyData).concat("}");
                 String queryText = "{".concat(keyName).concat("}");
                 url = url.replace(queryText, queryWithDummyDataWithinBraces);
             } else if (paramType.equals(Const.Retrofit.QUERY)) {
                 String keyName = annotation.getParameterList().getAttributes()[0].getLiteralValue();
-                String dummyData = ClassManager.get().getDummyDataOfType(param.getType());
+                String dummyData = ClassManager.get().getDummyDataOfType(param.getType(), false);
                 String query = "&".concat(keyName).concat("=").concat(dummyData);
                 paramsPart = paramsPart.concat(query);
             }

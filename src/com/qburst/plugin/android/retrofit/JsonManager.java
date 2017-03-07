@@ -299,11 +299,9 @@ public class JsonManager {
         String json = "{\n";
         for (PsiField field : psiClass.getFields()) {
             PsiType type = field.getType();
-            String value = ClassManager.get().getDummyDataOfType(type);
+            String value = ClassManager.get().getDummyDataOfType(type, true);
             if ("".equals(value)){
                 value = getJsonFromPsiClass(type);
-            }else {
-                value = StringUtils.getValueAsString(value);
             }
 
             json = json.concat("\"")
