@@ -313,6 +313,4 @@ public class Form2 {
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
-
-
 }
