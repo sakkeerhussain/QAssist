@@ -1,6 +1,10 @@
 QBurst Android Plugin
+
+This plugin is intented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only it can be be used to Integrate Retrofit to your project(for server communications).
+
     1. Retrofit Integrator
 ------
+  [jetbrains](https://plugins.jetbrains.com/androidstudio/plugin/9487-qburst-android-plugin)
 
 This is a plugin you can generate Json model from Json String.
 Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
@@ -11,21 +15,21 @@ Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 - Using IDE built-in plugin system on MacOs:
   - <kbd>Preferences</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "QBurstAndroidPlugin"</kbd> > <kbd>Install Plugin</kbd>
 - Manually:
-  - Download the [latest release](https://github.com/sakkeerhussain/qburst-android-plugin) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
-  - From official jetbrains store from [download](https://plugins.jetbrains.com/plugin/7654?pr=androidstudio)
-
+  - Download the [latest release](https://github.com/sakkeerhussain/qburst-android-plugin/files/782770/QBurstAndroidPlugin_17-02-2017.jar.zip) and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
+  - From official jetbrains store from [download](https://plugins.jetbrains.com/plugin/)
+  
 Restart IDE.
 
 ## Usage
 ### Use IDE menu
 
-![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
-![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23055729/5e209dee-f50d-11e6-933e-bcde2953d00a.png)
+![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23060290/26f98fae-f523-11e6-9d9c-6be6f8012900.png)
 
-
-## Demo picture
-![gsonFormat.gif](http://upload-images.jianshu.io/upload_images/166866-ff9dc336af72d7d7.gif?imageMogr2/auto-orient/strip)
-
+## Demo pictures
+![Form 1.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
+![Form 2.png](https://cloud.githubusercontent.com/assets/7835361/23055729/5e209dee-f50d-11e6-933e-bcde2953d00a.png)
+![Form 3.png](https://cloud.githubusercontent.com/assets/7835361/23055731/5e215176-f50d-11e6-824a-a8d2a1d469f7.png)
+  
 ## Version Info
 
 v1.0
