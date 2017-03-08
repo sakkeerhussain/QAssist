@@ -297,6 +297,9 @@ public class JsonManager {
     public static String getJsonFromPsiClass(PsiType psiClassType){
         // TODO: 07/03/17 Handle list case.
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiClassType);
+        if (psiClass == null) {
+            return "<null>";
+        }
         String json = "{";
         for (PsiField field : psiClass.getFields()) {
             PsiType type = field.getType();
