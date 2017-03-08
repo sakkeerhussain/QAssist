@@ -51,6 +51,10 @@ import java.util.*;
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
 
+    public boolean isRepairMode() {
+        return repairMode;
+    }
+
     private boolean repairMode;
 
     private Project project;
