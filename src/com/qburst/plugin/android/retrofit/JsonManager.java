@@ -321,7 +321,10 @@ public class JsonManager {
                     .concat(value)
                     .concat(",");
         }
-        json = json.substring(0, json.length()-1) + "}";
+        if (json.length() > 1) {
+            json = json.substring(0, json.length() - 1);
+        }
+        json = json + "}";
         if (JsonManager.isValidJson(json)){
             return JsonManager.formatJson(json);
         }else {
