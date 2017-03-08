@@ -50,7 +50,6 @@ public class UrlStringUtil {
             item.setKey(queryKey);
             item.setValue(queryValue);
             result.add(item);
-            System.out.println(matchedString);
         }
         return result;
     }
@@ -67,7 +66,6 @@ public class UrlStringUtil {
             item.setKey(queryKey);
             item.setValue(queryValue);
             result.add(item);
-            System.out.println(matchedString);
         }
         return result;
     }
