@@ -2,6 +2,7 @@ package com.qburst.plugin.android.retrofit.forms;
 
 import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.EndPointDataModel;
+import com.qburst.plugin.android.retrofit.JsonManager;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 import com.qburst.plugin.android.utils.http.HTTPUtils;
 import com.qburst.plugin.android.utils.http.UrlParamModel;
@@ -70,7 +71,7 @@ public class Form2 {
     private void formatResponseButtonActionListener() {
         formatResponseButton.addActionListener(e -> {
             String json = responseModelTextArea.getText();
-            responseModelTextArea.setText(formatJson(json));
+            responseModelTextArea.setText(JsonManager.formatJson(json));
         });
 
     }
@@ -78,7 +79,7 @@ public class Form2 {
     private void formatRequestButtonActionListener() {
         formatRequestButton.addActionListener(e -> {
             String json = requestModelTextArea.getText();
-            requestModelTextArea.setText(formatJson(json));
+            requestModelTextArea.setText(JsonManager.formatJson(json));
         });
     }
     private void cancelButtonActionListener() {
@@ -259,29 +260,6 @@ public class Form2 {
         return null;
     }
 
-    private String formatJson(String json) {
-        json = json.trim();
-        if (json.startsWith("{")) {
-            try {
-                JSONObject jsonObject = new JSONObject(json);
-                return jsonObject.toString(4);
-            }catch (JSONException e){
-                // TODO: 23/02/17 show invalid json message to user.
-                return json;
-            }
-        } else if (json.startsWith("[")) {
-            try {
-                JSONArray jsonArray = new JSONArray(json);
-                return jsonArray.toString(4);
-            }catch (JSONException e){
-                // TODO: 23/02/17 show invalid json message to user.
-                return json;
-            }
-        } else {
-            return json;
-        }
-    }
-
     private void storeData() {
         EndPointDataModel endPointData = new EndPointDataModel();
         endPointData.setEndPointNo(currentEndPoint);
@@ -335,6 +313,4 @@ public class Form2 {
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
-
-
 }

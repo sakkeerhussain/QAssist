@@ -10,6 +10,7 @@ import com.qburst.plugin.android.utils.string.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -294,23 +295,90 @@ public class JsonManager {
     * Class to Json
     */
     public static String getJsonFromPsiClass(PsiType psiClassType){
+        // TODO: 07/03/17 Handle list case.
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiClassType);
-        String json = "{\n";
+        if (psiClass == null) {
+            return "<null>";
+        }
+        String json = "{";
         for (PsiField field : psiClass.getFields()) {
             PsiType type = field.getType();
-            String value = ClassManager.get().getDummyDataOfType(type);
+            String value = ClassManager.get().getDummyDataOfType(type, true);
             if ("".equals(value)){
                 value = getJsonFromPsiClass(type);
-            }else {
-                value = StringUtils.getValueAsString(value);
+            }
+
+            String jsonFieldName = field.getNameIdentifier().getText();
+            for (PsiAnnotation psiAnnotation : field.getModifierList().getAnnotations()) {
+                if (Constants.ClassName.SerializedName.equals(psiAnnotation.getQualifiedName())){
+                    PsiNameValuePair[] attributes = psiAnnotation.getParameterList().getAttributes();
+                    if (attributes.length > 0) {
+                        jsonFieldName = attributes[0].getLiteralValue();
+                    }
+                }
             }
 
             json = json.concat("\"")
-                    .concat(field.getNameIdentifier().getText())
+                    .concat(jsonFieldName)
                     .concat("\":")
                     .concat(value)
-                    .concat(",\n");
+                    .concat(",");
         }
-        return json.substring(0, json.length()-2) + "}";
+        if (json.length() > 1) {
+            json = json.substring(0, json.length() - 1);
+        }
+        json = json + "}";
+        if (JsonManager.isValidJson(json)){
+            return JsonManager.formatJson(json);
+        }else {
+            return "";
+        }
+    }
+
+    /*
+    * Utils
+    */
+    public static boolean isValidJson(String json) {
+        json = json.trim();
+        if (json.startsWith("{")) {
+            try {
+                new JSONObject(json);
+                return true;
+            }catch (JSONException e){
+                return false;
+            }
+        } else if (json.startsWith("[")) {
+            try {
+                new JSONArray(json);
+                return true;
+            }catch (JSONException e){
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public static String formatJson(String json) {
+        json = json.trim();
+        if (json.startsWith("{")) {
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                return jsonObject.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
+        } else if (json.startsWith("[")) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                return jsonArray.toString(4);
+            }catch (JSONException e){
+                // TODO: 23/02/17 show invalid json message to user.
+                return json;
+            }
+        } else {
+            return json;
+        }
     }
 }

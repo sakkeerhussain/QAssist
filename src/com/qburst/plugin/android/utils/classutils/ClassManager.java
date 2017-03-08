@@ -167,9 +167,13 @@ public class ClassManager {
 //        return null;
 //    }
 
-    public String getDummyDataOfType(PsiType type){
+    public String getDummyDataOfType(PsiType type, boolean stringWrappedInQuotes){
         if (type.equalsToText(CommonClassNames.JAVA_LANG_STRING)){
-            return "dummyStr";
+            if (stringWrappedInQuotes) {
+                return "\"dummyStr\"";
+            }else{
+                return "dummyStr";
+            }
         }else if (type.equalsToText(CommonClassNames.JAVA_LANG_INTEGER) || type.equalsToText("int")){
             return "1";
         }else if (type.equalsToText(CommonClassNames.JAVA_LANG_FLOAT) || type.equalsToText("float")){
