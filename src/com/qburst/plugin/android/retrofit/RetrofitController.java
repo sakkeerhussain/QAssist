@@ -338,6 +338,13 @@ public class RetrofitController {
 
     private void generateGetterAndSetterMethod(ClassModel classModel) {
         List<FieldModel> fieldModels= classModel.getFields();
+        if(classModel.getSubClasses().size()>0)
+        {
+            for(int i =0;i<classModel.getSubClasses().size();i++){
+                generateGetterAndSetterMethod(classModel.getSubClasses().get(i));
+            }
+
+        }
         for (FieldModel field : fieldModels) {
             String fieldName = field.getFieldName();
             String fieldType = field.getType();
