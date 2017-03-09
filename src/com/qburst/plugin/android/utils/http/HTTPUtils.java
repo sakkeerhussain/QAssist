@@ -7,7 +7,6 @@ public class HTTPUtils {
 
     public static boolean isPayloadNotSupportingMethod(String method) {
         return ("GET".equals(method)
-                || "DELETE".equals(method)
                 || "HEAD".equals(method)
                 || "OPTIONS".equals(method));
     }
