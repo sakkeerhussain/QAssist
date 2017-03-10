@@ -52,6 +52,10 @@ import java.util.*;
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
 
+    public boolean isRepairMode() {
+        return repairMode;
+    }
+
     private boolean repairMode;
 
     private Project project;
@@ -333,7 +337,7 @@ public class RetrofitController {
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             if (HTTPUtils.isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
-                return true;
+                continue;
             }
             ClassModel classModel = new JsonManager().getRequestClassModel(endPointDataModel,
                     project, psiDirectoryRequest);
@@ -350,6 +354,13 @@ public class RetrofitController {
 
     private void generateGetterAndSetterMethod(ClassModel classModel) {
         List<FieldModel> fieldModels= classModel.getFields();
+        if(classModel.getSubClasses().size()>0)
+        {
+            for(int i =0;i<classModel.getSubClasses().size();i++){
+                generateGetterAndSetterMethod(classModel.getSubClasses().get(i));
+            }
+
+        }
         for (FieldModel field : fieldModels) {
             String fieldName = field.getFieldName();
             String fieldType = field.getType();

@@ -220,7 +220,7 @@ public class Form2 {
                 new JSONObject(requestModelTextArea.getText());
             } catch (JSONException e) {
                 e.printStackTrace();
-                errorLabel.setText("Request model is not a valid JSON");
+                errorLabel.setText("Request model is not valid");
                 return false;
             }
         }
@@ -232,7 +232,7 @@ public class Form2 {
         try {
             new JSONObject(responseModelTextArea.getText());
         } catch (JSONException e) {
-            errorLabel.setText("Response model is not a valid JSON");
+            errorLabel.setText("Response model is not valid");
             return false;
         }
         errorLabel.setText("");

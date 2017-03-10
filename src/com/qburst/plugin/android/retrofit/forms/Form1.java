@@ -66,10 +66,13 @@ public class Form1 {
     }
 
     private void validPackage() {
-        PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageNameTextField.getText());
-        if (!(pkg == null)){
-            packageNameWarningLabel.setText("Creating package with same name over writes the existing one");
-            return;
+        if(!controller.isRepairMode()) {
+            PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageNameTextField.getText());
+            if (!(pkg == null)) {
+                packageNameWarningLabel.setText("Creating package with same name over writes the existing one");
+                return;
+            }
+
         }
         packageNameWarningLabel.setText("");
         return;
