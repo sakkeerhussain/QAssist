@@ -1,13 +1,11 @@
 ## QAssist - Android Studio Plugin
 
-This plugin is intented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only it can be be used to Integrate Retrofit to your project(for server communications).
+This plugin is intented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only, this can be be used to Integrate Retrofit to your project(for server communications). Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 
-    1. Retrofit Integrator
-------
+1. Integrate Retrofit to your project.
+2. ...
+
   [jetbrains](https://plugins.jetbrains.com/androidstudio/plugin/9487-qburst-android-plugin)
-
-This is a plugin you can generate Json model from Json String.
-Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 
 ## Install   
 - Using IDE built-in plugin system on Windows:
@@ -24,6 +22,10 @@ Restart IDE.
 ### Use IDE menu
 
 ![Generate.png](https://cloud.githubusercontent.com/assets/7835361/23060290/26f98fae-f523-11e6-9d9c-6be6f8012900.png)
+
+
+    1. Retrofit Integrator
+------
 
 ## Demo pictures
 ![Form 1.png](https://cloud.githubusercontent.com/assets/7835361/23055730/5e21059a-f50d-11e6-98ad-b3670d1e7c03.png)
