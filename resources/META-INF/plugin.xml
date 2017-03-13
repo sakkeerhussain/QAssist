@@ -1,6 +1,6 @@
 <idea-plugin version="2">
-    <id>com.qburst.plugins.android</id>
-    <name>QBurst Android Plugin</name>
+    <id>com.qburst.plugin.android</id>
+    <name>QAssist</name>
     <version>1.1</version>
     <vendor email="sakkeer@qburst.com" url="http://www.qburst.com">QBurst</vendor>
 
