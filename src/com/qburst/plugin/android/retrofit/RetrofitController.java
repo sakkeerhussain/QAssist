@@ -1,5 +1,4 @@
 package com.qburst.plugin.android.retrofit;
-
 import com.android.tools.idea.gradle.parser.BuildFileKey;
 import com.android.tools.idea.gradle.parser.Dependency;
 import com.android.tools.idea.gradle.parser.GradleBuildFile;
@@ -19,10 +18,7 @@ import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.SourceFolderImpl;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.PsiClassImplUtil;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
-import com.intellij.psi.util.PsiClassUtil;
-import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.SmartList;
 import com.qburst.plugin.android.retrofit.forms.Form1;
 import com.qburst.plugin.android.retrofit.forms.Form2;
@@ -41,8 +37,6 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.jetbrains.jps.model.java.JavaSourceRootProperties;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
-import org.junit.platform.commons.util.AnnotationUtils;
-
 import javax.swing.*;
 import java.util.*;
 
@@ -51,13 +45,10 @@ import java.util.*;
  */
 public class RetrofitController {
     private static final String TAG = "RetrofitController";
-
     public boolean isRepairMode() {
         return repairMode;
     }
-
     private boolean repairMode;
-
     private Project project;
     private Module moduleSelected;
     private String baseUrl;
@@ -65,7 +56,6 @@ public class RetrofitController {
     private int noOfEndPoints;
     private List<EndPointDataModel> endPointDataModelList;
     private boolean gradleFileChanged;
-
     public RetrofitController() {
         endPointDataModelList = new ArrayList<>();
         packageName = Constants.PACKAGE_NAME_RETROFIT;
@@ -109,21 +99,17 @@ public class RetrofitController {
             endPointDataModel.setEndPointNo(i+1);
             endPointDataModel.setCreateIgnoreModelClasses(true);
             endPointDataModel.setEndPointName(method.getName());
-
             // TODO: 02/03/17 handle no annotation case
             PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
             String httpMethod = annotation.getQualifiedName();
             httpMethod = ClassStringUtil.getClassNameFromQualified(httpMethod);
             endPointDataModel.setMethod(httpMethod);
-
             String endPointUrl = StringUtils.getUnwrapStringValue(annotation.getParameterList().getAttributes()[0].getValue().getText());
             endPointUrl = UrlStringUtil.getUrlWithDummyData(endPointUrl, method.getParameterList());
             endPointDataModel.setEndPointUrl(endPointUrl);
-
             PsiType responseClassType = ((PsiClassReferenceType) method.getReturnType()).getParameters()[0];
             endPointDataModel.setResponseModel(JsonManager.getJsonFromPsiClass(responseClassType));
             endPointDataModel.setResponseModelClassName(responseClassType.getCanonicalText());
-
             for (PsiParameter psiParameter: method.getParameterList().getParameters()){
                 Log.d("PsiParameter", psiParameter.getText());
                 PsiAnnotation psiParameterAnnotation = psiParameter.getModifierList().getAnnotations()[0];
@@ -134,7 +120,6 @@ public class RetrofitController {
                     endPointDataModel.setRequestModelClassName(requestClassType.getCanonicalText());
                 }
             }
-
             endPointDataModelList.add(endPointDataModel);
         }
     }
@@ -181,8 +166,7 @@ public class RetrofitController {
         this.sourceFolderSelected = sourceFolderSelected;
     }
 
-    public Module getModuleSelected()
-    {
+    public Module getModuleSelected(){
         return moduleSelected;
     }
 
@@ -304,14 +288,12 @@ public class RetrofitController {
     }
 
     private boolean createClasses(ProgressIndicator indicator) {
-
         PsiPackage pkgRequest = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
         PsiPackage pkgResponse = JavaPsiFacade.getInstance(project).findPackage(packageName + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
         if (pkgRequest == null || pkgResponse == null) {
             //NotificationManager.get().integrationFailedNotification(project, errorMessage);
             return false;
         }
-
         indicator.setText("Creating request model classes");
         indicator.setFraction(0.4);
         if (!createRequestModelClasses(pkgRequest.getDirectories()[0], indicator)) {
@@ -322,8 +304,6 @@ public class RetrofitController {
         if (!createResponseModelClasses(pkgResponse.getDirectories()[0], indicator)) {
             return false;
         }
-
-
         //get retrofit directory
         PsiPackage pkg = JavaPsiFacade.getInstance(project).findPackage(packageName);
         if (pkg == null) {
@@ -333,7 +313,6 @@ public class RetrofitController {
         return createServiceClass(psiDirectory, indicator)
                 && createManagerClass(psiDirectory, indicator);
     }
-
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             if (HTTPUtils.isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
@@ -359,11 +338,10 @@ public class RetrofitController {
             for(int i =0;i<classModel.getSubClasses().size();i++){
                 generateGetterAndSetterMethod(classModel.getSubClasses().get(i));
             }
-
         }
         for (FieldModel field : fieldModels) {
             String fieldName = field.getFieldName();
-            String fieldType = field.getType();
+            String fieldType = field.getFullNameType();
             String getMethodName = "get" + StringUtils.capitaliseFirstLetter(field.getFieldName());
             String setMethodName = "set" + StringUtils.capitaliseFirstLetter(field.getFieldName());
             String getInnerContent = "return this." + fieldName + ";";

@@ -69,8 +69,9 @@ public class FieldModel {
             fieldSb.append("static ");
         }
 
-        if (type != null) {
-            fieldSb.append(type).append(" ");
+        String fullNameType = getFullNameType();
+        if (fullNameType != null) {
+            fieldSb.append(fullNameType).append(" ");
         }else{
             fieldSb.append("Null").append(" ");
         }
@@ -86,6 +87,11 @@ public class FieldModel {
 //        }
 
         return fieldSb.toString();
+    }
+
+
+    public String getFullNameType() {
+        return type;
     }
 
     //getter and setter
