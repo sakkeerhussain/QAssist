@@ -71,6 +71,18 @@ public class RetrofitController {
         this.frame = new JFrame("Retrofit");
         openForm1();
     }
+    public int getSizeofEndPointDataModelList()
+    {
+        return endPointDataModelList.size();
+    }
+    public void  setSizeofEndPointDataModelList(int size)
+    {
+        for(int i = noOfEndPoints; i<endPointDataModelList.size();i++)
+        {
+            endPointDataModelList.remove(i);
+        }
+        return ;
+    }
 
     public boolean isAvailRepairRetrofitAction(AnActionEvent event) {
         return !(ClassManager.get().isClassExists("RetrofitManager", event.getProject(), this) == null
@@ -189,6 +201,7 @@ public class RetrofitController {
                 return endPointDataModel;
             }
         }
+
         return new EndPointDataModel();
     }
 
@@ -240,7 +253,6 @@ public class RetrofitController {
         if (buildFile == null) { return false; }
         List<Dependency> value = (List<Dependency>)buildFile.getValue(BuildFileKey.DEPENDENCIES);
         final List<Dependency> dependencies = value != null ? value : new ArrayList<Dependency>();
-
         gradleFileChanged = false;
         //new MavenArtifact
         Dependency retrofit = new Dependency(Dependency.Scope.COMPILE,
