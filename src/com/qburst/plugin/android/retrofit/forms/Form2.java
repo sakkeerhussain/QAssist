@@ -266,8 +266,8 @@ public class Form2 {
         endPointData.setEndPointName(endPointNameTextField.getText());
         endPointData.setEndPointUrl(endPointUrlTextField.getText());
         endPointData.setMethod(methodChooserComboBox.getSelectedItem().toString());
-        endPointData.setRequestModel(requestModelTextArea.getText());
-        endPointData.setResponseModel(responseModelTextArea.getText());
+        endPointData.setRequestModel(requestModelTextArea.getText().trim());
+        endPointData.setResponseModel(responseModelTextArea.getText().trim());
         controller.setEndPointDataModel(endPointData);
     }
 
