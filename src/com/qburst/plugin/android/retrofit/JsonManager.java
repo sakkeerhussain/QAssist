@@ -342,7 +342,7 @@ public class JsonManager {
         if (JsonManager.isValidJson(json)){
             return JsonManager.formatJson(json);
         }else {
-            return "Error reading class json";
+            return "Error reading json from model class";
         }
     }
 
