@@ -145,7 +145,10 @@ public class Form1 {
 
         String noOfEndPointsString = noOfEndPointsTextField.getText();
         try {
-            Integer.parseInt(noOfEndPointsString);
+            if(Integer.parseInt(noOfEndPointsString)<1){
+                errorLabel.setText("Invalid number provided for no. of end points.");
+                return false;
+            }
         }catch (Exception exception){
             errorLabel.setText("Invalid number provided for no. of end points.");
             return false;
