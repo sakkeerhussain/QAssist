@@ -65,7 +65,8 @@ public class Constants {
         public static final String MANAGER = "RetrofitManager";
         public static final String SERVICE = "APIService";
 
-        public static final String SerializedName = "com.google.gson.annotations.SerializedName";
+        public static final String SERIALIZED_NAME = "com.google.gson.annotations.SerializedName";
+        public static final String JAVA_UTIL_LIST = "java.util.List";
     }
 
     public class RegExp{

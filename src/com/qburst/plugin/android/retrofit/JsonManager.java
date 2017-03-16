@@ -295,10 +295,18 @@ public class JsonManager {
     * Class to Json
     */
     public static String getJsonFromPsiClass(PsiType psiClassType){
-        // TODO: 07/03/17 Handle list case.
+        boolean listTypeField = false;
+        if (psiClassType.getCanonicalText().startsWith(Constants.ClassName.JAVA_UTIL_LIST)) {
+            psiClassType = ((PsiClassReferenceType) psiClassType).getParameters()[0];
+            listTypeField = true;
+        }
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiClassType);
         if (psiClass == null) {
-            return "<null>";
+            if (listTypeField){
+                return "[{\"<null>\"},{\"<null>\"}]";
+            }else {
+                return "{\"<null>\"}";
+            }
         }
         String json = "{";
         for (PsiField field : psiClass.getFields()) {
@@ -310,7 +318,7 @@ public class JsonManager {
 
             String jsonFieldName = field.getNameIdentifier().getText();
             for (PsiAnnotation psiAnnotation : field.getModifierList().getAnnotations()) {
-                if (Constants.ClassName.SerializedName.equals(psiAnnotation.getQualifiedName())){
+                if (Constants.ClassName.SERIALIZED_NAME.equals(psiAnnotation.getQualifiedName())){
                     PsiNameValuePair[] attributes = psiAnnotation.getParameterList().getAttributes();
                     if (attributes.length > 0) {
                         jsonFieldName = attributes[0].getLiteralValue();
@@ -327,11 +335,14 @@ public class JsonManager {
         if (json.length() > 1) {
             json = json.substring(0, json.length() - 1);
         }
-        json = json + "}";
+        json = json.concat("}");
+        if (listTypeField){
+            json =  "["+json+","+json+"]";
+        }
         if (JsonManager.isValidJson(json)){
             return JsonManager.formatJson(json);
         }else {
-            return "";
+            return "Error reading class json";
         }
     }
 
