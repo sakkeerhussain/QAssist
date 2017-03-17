@@ -175,6 +175,10 @@ public class Form1 {
             controller.setBaseUrl(baseUrlTextField.getText());
             controller.setPackageName(packageNameTextField.getText());
             controller.setNoOfEndPoints(Integer.parseInt(noOfEndPointsTextField.getText()));
+            if(controller.getNoOfEndPoints()<controller.getSizeofEndPointDataModelList())
+            {
+                controller.setSizeofEndPointDataModelList(controller.getNoOfEndPoints());
+            }
             controller.setModuleSelected(modules.get(modulesList.getSelectedIndex()));
             controller.setSourceFolderSelected(sourceFolders.get(sourceFolderList.getSelectedIndex()));
             controller.openForm2(true);
