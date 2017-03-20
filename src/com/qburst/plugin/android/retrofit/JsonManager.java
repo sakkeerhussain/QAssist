@@ -309,7 +309,7 @@ public class JsonManager {
             }
         }
         String json = "{";
-        for (PsiField field : psiClass.getFields()) {
+        for (PsiField field : psiClass.getAllFields()) {
             PsiType type = field.getType();
             String value = ClassManager.get().getDummyDataOfType(type, true);
             if ("".equals(value)){
