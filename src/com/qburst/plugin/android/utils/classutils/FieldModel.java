@@ -138,4 +138,19 @@ public class FieldModel {
     public void setTargetClass(ClassModel targetClass) {
         this.targetClass = targetClass;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FieldModel that = (FieldModel) o;
+
+        return isStatic == that.isStatic
+                && isFinal == that.isFinal
+                && accessSpecifier.equals(that.accessSpecifier)
+                && getFullNameType().equals(that.getFullNameType())
+                && fieldName.equals(that.fieldName)
+                && key.equals(that.key);
+    }
 }

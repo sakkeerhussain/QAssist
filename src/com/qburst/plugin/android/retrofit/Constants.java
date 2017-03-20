@@ -7,6 +7,7 @@ public class Constants {
     public static final String STRING_MODEL = "Model";
     public static final String STRING_REQUEST_MODEL = "RequestModel";
     public static final String STRING_RESPONSE_MODEL = "ResponseModel";
+    public static final String STRING_BASE_RESPONSE_MODEL = "Base" + STRING_RESPONSE_MODEL;
 
     public static final String PACKAGE_NAME_RETROFIT = "com.qburst.retrofit";
     public static final String PACKAGE_NAME_RETROFIT_REQUEST = ".model.request";

@@ -335,7 +335,7 @@ public class RetrofitController {
             indicator.setText("Creating "+classModel.getName());
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
             endPointDataModel.setRequestModelClassName(classModel.getQualifiedName());
-            generateGetterAndSetterMethod(classModel);
+            classModel.generateGetterAndSetterMethods();
             if (!ClassManager.get().createClass(classModel)){
                 return false;
             }
@@ -343,41 +343,27 @@ public class RetrofitController {
         return true;
     }
 
-    private void generateGetterAndSetterMethod(ClassModel classModel) {
-        List<FieldModel> fieldModels= classModel.getFields();
-        if(classModel.getSubClasses().size()>0)
-        {
-            for(int i =0;i<classModel.getSubClasses().size();i++){
-                generateGetterAndSetterMethod(classModel.getSubClasses().get(i));
-            }
-        }
-        for (FieldModel field : fieldModels) {
-            String fieldName = field.getFieldName();
-            String fieldType = field.getFullNameType();
-            String getMethodName = "get" + StringUtils.capitaliseFirstLetter(field.getFieldName());
-            String setMethodName = "set" + StringUtils.capitaliseFirstLetter(field.getFieldName());
-            String getInnerContent = "return this." + fieldName + ";";
-            String setInnerContent = "this." + fieldName + " = " + fieldName + ";";
-            List<ParameterModel> parameterModels = new ArrayList<>();
-            ParameterModel parameterModel = new ParameterModel(fieldType, fieldName);
-            parameterModels.add(parameterModel);
-            MethodModel getMethod = new MethodModel(classModel, "private", false, fieldType, getMethodName, null, getInnerContent);
-            MethodModel setMethod = new MethodModel(classModel, "private", false, "void", setMethodName, parameterModels, setInnerContent);
-            classModel.addMethod(getMethod);
-            classModel.addMethod(setMethod);
-        }
-    }
-
     private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse, ProgressIndicator indicator) {
-        // TODO: 10/02/17 Create base class for response model accoding to comon fields of all APIs.
+        List<ClassModel> classModelList = new ArrayList<>();
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             ClassModel classModel = new JsonManager().getResponseClassModel(endPointDataModel,
                     project, psiDirectoryResponse);
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_RESPONSE);
             endPointDataModel.setResponseModelClassName(classModel.getQualifiedName());
             indicator.setText("Creating "+classModel.getName());
-            generateGetterAndSetterMethod(classModel);
-            if (!ClassManager.get().createClass(classModel)){
+            classModelList.add(classModel);
+        }
+
+        if (classModelList.size()<1){
+            return true;
+        }
+        if (Configurations.GEN_BASE_RESPONSE_CLASS
+                && classModelList.size() > 1) {
+            classModelList = ClassManager.get().createBaseClassModel(classModelList);
+        }
+        for (ClassModel classModel : classModelList) {
+            classModel.generateGetterAndSetterMethods();
+            if (!ClassManager.get().createClass(classModel)) {
                 return false;
             }
         }

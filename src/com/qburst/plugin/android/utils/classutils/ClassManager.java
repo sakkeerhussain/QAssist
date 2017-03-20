@@ -1,20 +1,22 @@
 package com.qburst.plugin.android.utils.classutils;
 
-import com.google.protobuf.Descriptors;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
-import com.intellij.psi.impl.source.PsiFieldImpl;
+import com.intellij.psi.impl.PsiClassImplUtil;
+import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.impl.source.tree.JavaElementType;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
+import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.RetrofitController;
-import org.jetbrains.plugins.groovy.lang.psi.util.PsiUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sakkeer on 01/02/17.
@@ -46,6 +48,10 @@ public class ClassManager {
                 classObj = JavaDirectoryService.getInstance().createInterface(classModel.getDirectory(),
                         classModel.getName());
             }
+            //classObj.
+            //((PsiClassImpl)classObj).sugetSuperClass();
+            //((PsiClassImpl)classObj).getSuperClass();
+
             classModel.setPsiClass(classObj);
             for (FieldModel field : classModel.getFields()) {
                 classModel.getPsiClass().add(field.getPsiField());
@@ -183,5 +189,38 @@ public class ClassManager {
         }else {
             return "";
         }
+    }
+
+    public List<ClassModel> createBaseClassModel(List<ClassModel> classModelList){
+        ClassModel baseClassModel = new ClassModel(classModelList.get(0));
+        baseClassModel.setName(Constants.STRING_BASE_RESPONSE_MODEL);
+        for (ClassModel classModel : classModelList) {
+            List<FieldModel> baseClassFields = new ArrayList<>(baseClassModel.getFields());
+            for (FieldModel fieldModel : baseClassFields) {
+                if (!classModel.isFieldPresent(fieldModel)) {
+                    baseClassModel.getFields().remove(fieldModel);
+                }
+            }
+        }
+        List<FieldModel> baseClassFields = baseClassModel.getFields();
+        String baseClassName = baseClassModel.getName();
+        for (ClassModel classModel : classModelList) {
+            classModel.setSuperClass(baseClassName);
+            List<FieldModel> fields = new ArrayList<>();
+            for (FieldModel fieldModel : classModel.getFields()) {
+                boolean found = false;
+                for (FieldModel baseFieldModel : baseClassFields) {
+                    if (baseFieldModel.equals(fieldModel)) {
+                        found = true;
+                    }
+                }
+                if (!found){
+                    fields.add(fieldModel);
+                }
+            }
+            classModel.setFields(fields);
+        }
+        classModelList.add(baseClassModel);
+        return classModelList;
     }
 }
