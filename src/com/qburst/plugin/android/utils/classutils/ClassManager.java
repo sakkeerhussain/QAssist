@@ -197,6 +197,9 @@ public class ClassManager {
             }
         }
         List<FieldModel> baseClassFields = baseClassModel.getFields();
+        if (baseClassFields.size() <= 0){
+            return classModelList;
+        }
         for (ClassModel classModel : classModelList) {
             classModel.setSuperClass(baseClassName);
             List<FieldModel> fields = new ArrayList<>();
