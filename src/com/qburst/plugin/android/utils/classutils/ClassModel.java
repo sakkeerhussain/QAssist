@@ -195,6 +195,14 @@ public class ClassModel {
         return name;
     }
 
+    public String getFullName() {
+        if (superClass == null || superClass.equals("")) {
+            return name;
+        }else{
+            return name + " extends " + superClass;
+        }
+    }
+
     public List<FieldModel> getFields() {
         return fields;
     }

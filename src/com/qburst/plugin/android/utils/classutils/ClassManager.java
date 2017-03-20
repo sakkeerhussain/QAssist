@@ -43,14 +43,11 @@ public class ClassManager {
             PsiClass classObj = null;
             if (classModel.getType() == ClassModel.Type.CLASS) {
                 classObj = JavaDirectoryService.getInstance().createClass(classModel.getDirectory(),
-                        classModel.getName());
+                        classModel.getFullName());
             } else if (classModel.getType() == ClassModel.Type.INTERFACE) {
                 classObj = JavaDirectoryService.getInstance().createInterface(classModel.getDirectory(),
-                        classModel.getName());
+                        classModel.getFullName());
             }
-            //classObj.
-            //((PsiClassImpl)classObj).sugetSuperClass();
-            //((PsiClassImpl)classObj).getSuperClass();
 
             classModel.setPsiClass(classObj);
             for (FieldModel field : classModel.getFields()) {
