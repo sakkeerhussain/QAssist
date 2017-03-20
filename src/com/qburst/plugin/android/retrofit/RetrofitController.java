@@ -326,6 +326,7 @@ public class RetrofitController {
                 && createManagerClass(psiDirectory, indicator);
     }
     private boolean createRequestModelClasses(PsiDirectory psiDirectoryRequest, ProgressIndicator indicator) {
+        List<ClassModel> classModelList = new ArrayList<>();
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
             if (HTTPUtils.isPayloadNotSupportingMethod(endPointDataModel.getMethod())) {
                 continue;
@@ -335,8 +336,18 @@ public class RetrofitController {
             indicator.setText("Creating "+classModel.getName());
             classModel.setPackageName(packageName  + Constants.PACKAGE_NAME_RETROFIT_REQUEST);
             endPointDataModel.setRequestModelClassName(classModel.getQualifiedName());
+            classModelList.add(classModel);
+        }
+        if (classModelList.size()<1){
+            return true;
+        }
+        if (Configurations.GEN_BASE_RESPONSE_CLASS
+                && classModelList.size() > 1) {
+            classModelList = ClassManager.get().createBaseClassModel(classModelList, Constants.STRING_BASE_REQUEST_MODEL);
+        }
+        for (ClassModel classModel : classModelList) {
             classModel.generateGetterAndSetterMethods();
-            if (!ClassManager.get().createClass(classModel)){
+            if (!ClassManager.get().createClass(classModel)) {
                 return false;
             }
         }
@@ -353,13 +364,12 @@ public class RetrofitController {
             indicator.setText("Creating "+classModel.getName());
             classModelList.add(classModel);
         }
-
         if (classModelList.size()<1){
             return true;
         }
         if (Configurations.GEN_BASE_RESPONSE_CLASS
                 && classModelList.size() > 1) {
-            classModelList = ClassManager.get().createBaseClassModel(classModelList);
+            classModelList = ClassManager.get().createBaseClassModel(classModelList, Constants.STRING_BASE_RESPONSE_MODEL);
         }
         for (ClassModel classModel : classModelList) {
             classModel.generateGetterAndSetterMethods();

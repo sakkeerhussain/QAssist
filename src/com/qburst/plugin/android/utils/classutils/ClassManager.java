@@ -5,14 +5,11 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.psi.impl.PsiClassImplUtil;
-import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.impl.source.tree.JavaElementType;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
-import com.qburst.plugin.android.retrofit.Constants;
 import com.qburst.plugin.android.retrofit.RetrofitController;
 
 import java.util.ArrayList;
@@ -188,9 +185,9 @@ public class ClassManager {
         }
     }
 
-    public List<ClassModel> createBaseClassModel(List<ClassModel> classModelList){
+    public List<ClassModel> createBaseClassModel(List<ClassModel> classModelList, String baseClassName){
         ClassModel baseClassModel = new ClassModel(classModelList.get(0));
-        baseClassModel.setName(Constants.STRING_BASE_RESPONSE_MODEL);
+        baseClassModel.setName(baseClassName);
         for (ClassModel classModel : classModelList) {
             List<FieldModel> baseClassFields = new ArrayList<>(baseClassModel.getFields());
             for (FieldModel fieldModel : baseClassFields) {
@@ -200,7 +197,6 @@ public class ClassManager {
             }
         }
         List<FieldModel> baseClassFields = baseClassModel.getFields();
-        String baseClassName = baseClassModel.getName();
         for (ClassModel classModel : classModelList) {
             classModel.setSuperClass(baseClassName);
             List<FieldModel> fields = new ArrayList<>();
