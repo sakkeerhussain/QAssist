@@ -354,9 +354,6 @@ public class RetrofitController {
         return true;
     }
 
-
-
-
     private boolean createResponseModelClasses(PsiDirectory psiDirectoryResponse, ProgressIndicator indicator) {
         List<ClassModel> classModelList = new ArrayList<>();
         for (EndPointDataModel endPointDataModel : endPointDataModelList) {
