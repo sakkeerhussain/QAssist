@@ -7,6 +7,8 @@ public class Constants {
     public static final String STRING_MODEL = "Model";
     public static final String STRING_REQUEST_MODEL = "RequestModel";
     public static final String STRING_RESPONSE_MODEL = "ResponseModel";
+    public static final String STRING_BASE_RESPONSE_MODEL = "Base" + STRING_RESPONSE_MODEL;
+    public static final String STRING_BASE_REQUEST_MODEL = "Base" + STRING_REQUEST_MODEL;
 
     public static final String PACKAGE_NAME_RETROFIT = "com.qburst.retrofit";
     public static final String PACKAGE_NAME_RETROFIT_REQUEST = ".model.request";
@@ -65,7 +67,8 @@ public class Constants {
         public static final String MANAGER = "RetrofitManager";
         public static final String SERVICE = "APIService";
 
-        public static final String SerializedName = "com.google.gson.annotations.SerializedName";
+        public static final String SERIALIZED_NAME = "com.google.gson.annotations.SerializedName";
+        public static final String JAVA_UTIL_LIST = "java.util.List";
     }
 
     public class RegExp{
