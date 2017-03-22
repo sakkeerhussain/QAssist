@@ -158,8 +158,8 @@ public class ClassModel {
             List<ParameterModel> parameterModels = new ArrayList<>();
             ParameterModel parameterModel = new ParameterModel(fieldType, fieldName);
             parameterModels.add(parameterModel);
-            MethodModel getMethod = new MethodModel(classModel, "private", false, fieldType, getMethodName, null, getInnerContent);
-            MethodModel setMethod = new MethodModel(classModel, "private", false, "void", setMethodName, parameterModels, setInnerContent);
+            MethodModel getMethod = new MethodModel(classModel, "public", false, fieldType, getMethodName, null, getInnerContent);
+            MethodModel setMethod = new MethodModel(classModel, "public", false, "void", setMethodName, parameterModels, setInnerContent);
             classModel.addMethod(getMethod);
             classModel.addMethod(setMethod);
         }

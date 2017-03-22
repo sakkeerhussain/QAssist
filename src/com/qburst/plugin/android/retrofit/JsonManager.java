@@ -378,19 +378,38 @@ public class JsonManager {
                 JSONObject jsonObject = new JSONObject(json);
                 return jsonObject.toString(4);
             }catch (JSONException e){
-                // TODO: 23/02/17 show invalid json message to user.
-                return json;
+                return null;
             }
         } else if (json.startsWith("[")) {
             try {
                 JSONArray jsonArray = new JSONArray(json);
                 return jsonArray.toString(4);
             }catch (JSONException e){
-                // TODO: 23/02/17 show invalid json message to user.
-                return json;
+                return null;
             }
         } else {
-            return json;
+            return null;
+        }
+    }
+
+    public static String getFormatJsonError(String json) {
+        json = json.trim();
+        if (json.startsWith("{")) {
+            try {
+                new JSONObject(json);
+                return "";
+            }catch (JSONException e){
+                return e.getLocalizedMessage();
+            }
+        } else if (json.startsWith("[")) {
+            try {
+                new JSONArray(json);
+                return "";
+            }catch (JSONException e){
+                return e.getLocalizedMessage();
+            }
+        } else {
+            return "Invalid first charachter found";
         }
     }
 }

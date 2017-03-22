@@ -46,6 +46,8 @@ public class Form2 {
     private JLabel requestModelLabel;
     private JButton urlHelpButton;
     private JScrollPane scrollPanel;
+    private JLabel responseModelErrorLabel;
+    private JLabel requestModelEerrorLabel;
     private RetrofitController controller;
     private Form2() {
         addActionListener();
@@ -70,16 +72,28 @@ public class Form2 {
 
     private void formatResponseButtonActionListener() {
         formatResponseButton.addActionListener(e -> {
-            String json = responseModelTextArea.getText();
-            responseModelTextArea.setText(JsonManager.formatJson(json));
+            responseModelErrorLabel.setText("");
+            String responseModelText = responseModelTextArea.getText();
+            String json = JsonManager.formatJson(responseModelText);
+            if (json == null){
+                responseModelErrorLabel.setText(JsonManager.getFormatJsonError(responseModelText));
+            }else {
+                responseModelTextArea.setText(json);
+            }
         });
 
     }
 
     private void formatRequestButtonActionListener() {
         formatRequestButton.addActionListener(e -> {
-            String json = requestModelTextArea.getText();
-            requestModelTextArea.setText(JsonManager.formatJson(json));
+            requestModelLabel.setText("");
+            String requestModelText = requestModelTextArea.getText();
+            String json = JsonManager.formatJson(requestModelText);
+            if (json == null){
+                requestModelEerrorLabel.setText(JsonManager.getFormatJsonError(requestModelText));
+            }else {
+                requestModelTextArea.setText(json);
+            }
         });
     }
     private void cancelButtonActionListener() {
@@ -141,7 +155,6 @@ public class Form2 {
         endPointNameTextField.getDocument().addDocumentListener(documentListener);
         requestModelTextArea.getDocument().addDocumentListener(documentListener);
         responseModelTextArea.getDocument().addDocumentListener(documentListener);
-
     }
 
     private void createDocumentListener() {
@@ -182,6 +195,8 @@ public class Form2 {
     }
 
     private boolean validData() {
+        requestModelEerrorLabel.setText("");
+        responseModelErrorLabel.setText("");
         if (endPointNameTextField.getText().isEmpty()) {
             errorLabel.setText("End point Name is empty");
             return false;
