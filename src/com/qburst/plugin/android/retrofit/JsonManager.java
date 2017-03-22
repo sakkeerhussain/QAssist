@@ -161,6 +161,7 @@ public class JsonManager {
                 result.setComment(type.toString());
             }
         }
+        // TODO: 22/03/17 Remove below line. Seems overwriting value.
         result.setKey(key);
         return result;
     }
