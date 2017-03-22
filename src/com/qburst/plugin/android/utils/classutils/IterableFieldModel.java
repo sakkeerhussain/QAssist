@@ -61,8 +61,7 @@ public class IterableFieldModel extends FieldModel {
 
 
     public String getFullNameType() {
-        String typeName = getClassTypeName();
-        return String.format(getTypeReg(), typeName);
+        return String.format(getTypeReg(), type);
     }
 
     private String getTypeReg() {
