@@ -60,7 +60,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="Methord"/>
+                      <text value="Method"/>
                     </properties>
                   </component>
                   <component id="8137c" class="javax.swing.JComboBox" binding="methodChooserComboBox">

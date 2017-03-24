@@ -42,7 +42,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="We will addd Retrofit dependency to your &quot;build.gradle&quot; file and will create a package called &quot;com.qburst.plugin.retrofit&quot; in your project. Please commit all your changes before doing this for your safty."/>
+                      <text value="We will addd Retrofit dependency to your &quot;build.gradle&quot; file and will create a package called &quot;com.qburst.plugin.retrofit&quot; in your project. Please commit all your changes before doing this for your safety."/>
                     </properties>
                   </component>
                   <component id="cf76" class="javax.swing.JLabel">
