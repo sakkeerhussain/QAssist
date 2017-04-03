@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/QBurstAndroidPlugin.iml" filepath="$PROJECT_DIR$/QBurstAndroidPlugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/QAssistAndroidPlugin.iml" filepath="$PROJECT_DIR$/QAssistAndroidPlugin.iml" />
     </modules>
   </component>
 </project>

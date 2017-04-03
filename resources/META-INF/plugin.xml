@@ -32,14 +32,16 @@
     </extensions>
 
     <actions>
-        <group id="qburst" text="QBurst" description="QBurst Menu">
+        <group id="qassist" text="QAssist" description="QAssist Menu">
             <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
 
-            <group id="qburst.retrofit" text="Retrofit" description="Retrofit Menu" popup="true">
-                <add-to-group group-id="qburst" anchor="first"/>
-                <action id="qburst.retrofit.integrate" class="com.qburst.plugin.android.retrofit.actions.RetrofitIntegrateAction"
+            <group id="qassist.retrofit" text="Retrofit" description="Retrofit Menu" popup="true">
+                <add-to-group group-id="qassist" anchor="first"/>
+                <action id="qassist.retrofit.integrate"
+                        class="com.qassist.plugin.android.retrofit.actions.RetrofitIntegrateAction"
                         text="Integrate" description="Retrofit Integrator"/>
-                <action id="qburst.retrofit.repair" class="com.qburst.plugin.android.retrofit.actions.RetrofitRepairAction"
+                <action id="qassist.retrofit.repair"
+                        class="com.qassist.plugin.android.retrofit.actions.RetrofitRepairAction"
                         text="Repair" description="Retrofit Repair"/>
             </group>
 

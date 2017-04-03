@@ -5,7 +5,7 @@ This plugin is intented to reduce effort of Android application development by g
 1. Integrate Retrofit to your project.
 2. ...
 
-  [jetbrains](https://plugins.jetbrains.com/androidstudio/plugin/9487-qburst-android-plugin)
+  [jetbrains](https://plugins.jetbrains.com/plugin/9487-qassist)
 
 ## Install
 - Using IDE built-in plugin system on Windows:
