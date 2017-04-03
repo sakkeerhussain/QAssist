@@ -1,10 +1,12 @@
 package com.qburst.plugin.android.utils.classutils;
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.impl.source.tree.JavaElementType;
 import com.intellij.psi.search.FilenameIndex;
@@ -37,15 +39,12 @@ public class ClassManager {
             classExists.delete();
         }
         try {
-            PsiClass classObj = null;
-            if (classModel.getType() == ClassModel.Type.CLASS) {
-                classObj = JavaDirectoryService.getInstance().createClass(classModel.getDirectory(),
-                        classModel.getFullName());
-            } else if (classModel.getType() == ClassModel.Type.INTERFACE) {
-                classObj = JavaDirectoryService.getInstance().createInterface(classModel.getDirectory(),
-                        classModel.getFullName());
-            }
-
+            PsiFile file = PsiFileFactoryImpl.getInstance(classModel.getProject())
+                    .createFileFromText(classModel.getName() + JavaFileType.DOT_DEFAULT_EXTENSION,
+                            JavaFileType.INSTANCE,
+                            classModel.getClassBaseFormat());
+            file = (PsiFile) classModel.getDirectory().add(file);
+            PsiClass classObj = ((PsiJavaFile)file).getClasses()[0];
             classModel.setPsiClass(classObj);
             for (FieldModel field : classModel.getFields()) {
                 classModel.getPsiClass().add(field.getPsiField());
@@ -136,36 +135,6 @@ public class ClassManager {
         }
         return null;
     }
-
-//    public VirtualFile isClassExists(String name, Project project, RetrofitController controller){
-//        for (Module module:ModuleManager.getInstance(project).getModules()){
-//            for (SourceFolder sourceRoot:controller.getSourceRoots(module)){
-//                if (sourceRoot.getFile().isDirectory()){
-//                    VirtualFile managerClass = isClassExists(sourceRoot.getFile(), name);
-//                    if (managerClass != null){
-//                        return managerClass;
-//                    }
-//                }
-//            }
-//        }
-//        return null;
-//    }
-//
-//    private VirtualFile isClassExists(VirtualFile virtualFile, String name){
-//        if (virtualFile.isDirectory()) {
-//            for (VirtualFile child : virtualFile.getChildren()) {
-//                VirtualFile classObj = isClassExists(child, name);
-//                if (classObj != null) {
-//                    return classObj;
-//                }
-//            }
-//        }else {
-//            if (virtualFile.getName().equals(name + ".java")) {
-//                return virtualFile;
-//            }
-//        }
-//        return null;
-//    }
 
     public String getDummyDataOfType(PsiType type, boolean stringWrappedInQuotes){
         if (type.equalsToText(CommonClassNames.JAVA_LANG_STRING)){

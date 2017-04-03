@@ -203,6 +203,10 @@ public class ClassModel {
         }
     }
 
+    public String getClassBaseFormat() {
+        return "public "+type.toString().toLowerCase()+" " + this.getFullName() + "{}";
+    }
+
     public List<FieldModel> getFields() {
         return fields;
     }
