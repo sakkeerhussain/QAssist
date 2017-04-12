@@ -5,6 +5,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
@@ -58,6 +59,7 @@ public class ClassManager {
                 }
             }
             JavaCodeStyleManager.getInstance(classModel.getProject()).shortenClassReferences(classObj);
+            CodeStyleManager.getInstance(classModel.getProject()).reformat(classObj);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
