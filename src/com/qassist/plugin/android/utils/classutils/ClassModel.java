@@ -247,6 +247,11 @@ public class ClassModel {
         return superClass;
     }
 
+    public boolean isFieldPresentInPsi(FieldModel field) {
+        // TODO: 09/06/17 Complete logic here.
+        return false;
+    }
+
     public enum Type{
         CLASS, INTERFACE
     }

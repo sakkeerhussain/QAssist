@@ -5,4 +5,5 @@ package com.qassist.plugin.android.retrofit;
  */
 public class Configurations {
     public static final boolean GEN_BASE_RESPONSE_CLASS = true;
+    public static final boolean DONT_CREATE_REPEATING_MODELS = true;
 }
