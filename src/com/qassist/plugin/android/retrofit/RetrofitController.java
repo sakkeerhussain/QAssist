@@ -58,15 +58,15 @@ public class RetrofitController {
     private int noOfEndPoints;
     private List<EndPointDataModel> endPointDataModelList;
     private boolean gradleFileChanged;
+    private JFrame frame;
+    private SourceFolder sourceFolderSelected;
+
     public RetrofitController() {
         endPointDataModelList = new ArrayList<>();
         packageName = Constants.PACKAGE_NAME_RETROFIT;
         repairMode = false;
     }
 
-    private JFrame frame;
-
-    private SourceFolder sourceFolderSelected;
 
     public void integrateRetrofitAction(AnActionEvent event) {
         this.project = event.getProject();
@@ -139,14 +139,12 @@ public class RetrofitController {
     }
 
     public void openForm1(){
-        Log.d(TAG, "openForm1() called");
         String[] flags = new String[0];
         Form1 form1 = Form1.main(flags, frame);
         form1.setData(this, project, baseUrl, packageName, noOfEndPoints, moduleSelected);
     }
 
     public void openForm2(boolean fromStart){
-        Log.d(TAG, "openForm2() called");
         String[] flags = new String[0];
         Form2 form = Form2.main(flags, frame);
         form.setData(this);
@@ -158,14 +156,12 @@ public class RetrofitController {
     }
 
     public void openForm3(){
-        Log.d(TAG, "openForm3() called");
         String[] flags = new String[0];
         Form3 form3 = Form3.main(flags, frame);
         form3.setData(this);
     }
 
     public void hideForm(){
-        Log.d(TAG, "hideForm() called");
         frame.setVisible(false);
     }
 
@@ -212,7 +208,6 @@ public class RetrofitController {
     }
 
     public void integrateRetrofit() {
-        hideForm();
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Integrating Retrofit") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -347,9 +342,11 @@ public class RetrofitController {
                 && classModelList.size() > 1) {
             classModelList = ClassManager.get().createBaseClassModel(classModelList, Constants.STRING_BASE_REQUEST_MODEL);
         }
+//        classModelList = ClassManager.get().clenUpClassModels(classModelList);
+        ClassManager.get().clenUpClassModels(classModelList);
         for (ClassModel classModel : classModelList) {
             classModel.generateGetterAndSetterMethods();
-            if (!ClassManager.get().createClass(classModel)) {
+            if (!ClassManager.get().createClass(classModel, this.repairMode)) {
                 return false;
             }
         }
@@ -375,7 +372,7 @@ public class RetrofitController {
         }
         for (ClassModel classModel : classModelList) {
             classModel.generateGetterAndSetterMethods();
-            if (!ClassManager.get().createClass(classModel)) {
+            if (!ClassManager.get().createClass(classModel, this.repairMode)) {
                 return false;
             }
         }
@@ -438,7 +435,7 @@ public class RetrofitController {
             classModel.addMethod(methodString);
         }
 
-        return ClassManager.get().createClass(classModel);
+        return ClassManager.get().createClass(classModel, this.repairMode);
     }
 
     private boolean createManagerClass(PsiDirectory psiDirectory, ProgressIndicator indicator) {
@@ -451,7 +448,7 @@ public class RetrofitController {
         staticField.setValue(StringUtils.getValueAsString(baseUrl));
         classModel.addField(staticField);
         classModel.addMethod(Constants.GET_INSTANCE_METHOD);
-        return ClassManager.get().createClass(classModel);
+        return ClassManager.get().createClass(classModel, this.repairMode);
     }
 
     public List<SourceFolder> getSourceRoots(Module moduleSelected) {

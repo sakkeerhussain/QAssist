@@ -14,6 +14,7 @@ import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.qassist.plugin.android.retrofit.RetrofitController;
+import com.qassist.plugin.android.utils.log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +35,29 @@ public class ClassManager {
         return instance;
     }
 
-    public boolean createClass(ClassModel classModel) {
+    public boolean createClass(ClassModel classModel, boolean reuse) {
         PsiJavaFileImpl classExists = isClassExistsAsImmediateChild(classModel.getDirectory(), classModel.getName());
-        if (classExists != null) {
-            classExists.delete();
-        }
+
         try {
-            PsiFile file = PsiFileFactoryImpl.getInstance(classModel.getProject())
-                    .createFileFromText(classModel.getName() + JavaFileType.DOT_DEFAULT_EXTENSION,
-                            JavaFileType.INSTANCE,
-                            classModel.getClassBaseFormat());
-            file = (PsiFile) classModel.getDirectory().add(file);
-            PsiClass classObj = ((PsiJavaFile)file).getClasses()[0];
+            PsiClass classObj;
+            if (reuse && classExists != null) {
+                classObj = classExists.getClasses()[0];
+            } else {
+                if (classExists != null) {
+                    classExists.delete();
+                }
+                PsiFile file = PsiFileFactoryImpl.getInstance(classModel.getProject())
+                        .createFileFromText(classModel.getName() + JavaFileType.DOT_DEFAULT_EXTENSION,
+                                JavaFileType.INSTANCE,
+                                classModel.getClassBaseFormat());
+                file = (PsiFile) classModel.getDirectory().add(file);
+                classObj = ((PsiJavaFile) file).getClasses()[0];
+            }
             classModel.setPsiClass(classObj);
             for (FieldModel field : classModel.getFields()) {
+                if (classModel.isFieldPresentInPsi(field)){
+                    // TODO: 09/06/17 Complete the logic.
+                }
                 classModel.getPsiClass().add(field.getPsiField());
             }
             for (PsiMethod method : classModel.getMethods()) {
@@ -104,7 +114,8 @@ public class ClassManager {
     }
 
     public PsiJavaFileImpl isClassExists(String name, Project project, RetrofitController controller) {
-        PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, name + ".java", GlobalSearchScope.allScope(project));
+        PsiFile[] psiFiles =
+                FilenameIndex.getFilesByName(project, name + ".java", GlobalSearchScope.allScope(project));
         if (psiFiles.length <= 0) {
             return null;
         } else {
@@ -112,23 +123,23 @@ public class ClassManager {
         }
     }
 
-    public Object getFieldValue(String fieldName, PsiClass classObj){
+    public Object getFieldValue(String fieldName, PsiClass classObj) {
         PsiField field = classObj.findFieldByName(fieldName, true);
         String value = null;
         if (field == null) {
             return null;
         }
         value = field.getNode().findChildByType(JavaElementType.LITERAL_EXPRESSION).getText();
-        if (field.getType().equalsToText(CommonClassNames.JAVA_LANG_STRING)){
-            return value.substring(1, value.length()-1);
-        }else if (PsiTypesUtil.compareTypes(field.getType(), PsiType.INT, true)){
+        if (field.getType().equalsToText(CommonClassNames.JAVA_LANG_STRING)) {
+            return value.substring(1, value.length() - 1);
+        } else if (PsiTypesUtil.compareTypes(field.getType(), PsiType.INT, true)) {
             return Integer.parseInt(value);
         }
         return value;
     }
 
     public Module getContainingModule(PsiClass classObj) {
-        for (Module module: ModuleManager.getInstance(classObj.getProject()).getModules()){
+        for (Module module : ModuleManager.getInstance(classObj.getProject()).getModules()) {
             GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
             PsiFile[] psiFiles = FilenameIndex.getFilesByName(classObj.getProject(), classObj.getName() + ".java", scope);
             if (psiFiles.length > 0) {
@@ -138,25 +149,25 @@ public class ClassManager {
         return null;
     }
 
-    public String getDummyDataOfType(PsiType type, boolean stringWrappedInQuotes){
-        if (type.equalsToText(CommonClassNames.JAVA_LANG_STRING)){
+    public String getDummyDataOfType(PsiType type, boolean stringWrappedInQuotes) {
+        if (type.equalsToText(CommonClassNames.JAVA_LANG_STRING)) {
             if (stringWrappedInQuotes) {
                 return "\"dummyStr\"";
-            }else{
+            } else {
                 return "dummyStr";
             }
-        }else if (type.equalsToText(CommonClassNames.JAVA_LANG_INTEGER) || type.equalsToText("int")){
+        } else if (type.equalsToText(CommonClassNames.JAVA_LANG_INTEGER) || type.equalsToText("int")) {
             return "1";
-        }else if (type.equalsToText(CommonClassNames.JAVA_LANG_FLOAT) || type.equalsToText("float")){
+        } else if (type.equalsToText(CommonClassNames.JAVA_LANG_FLOAT) || type.equalsToText("float")) {
             return "1.1";
-        }else  if (type.equalsToText(CommonClassNames.JAVA_LANG_DOUBLE) || type.equalsToText("double")){
+        } else if (type.equalsToText(CommonClassNames.JAVA_LANG_DOUBLE) || type.equalsToText("double")) {
             return "1.1111111111";
-        }else {
+        } else {
             return "";
         }
     }
 
-    public List<ClassModel> createBaseClassModel(List<ClassModel> classModelList, String baseClassName){
+    public List<ClassModel> createBaseClassModel(List<ClassModel> classModelList, String baseClassName) {
         ClassModel baseClassModel = new ClassModel(classModelList.get(0));
         baseClassModel.setName(baseClassName);
         for (ClassModel classModel : classModelList) {
@@ -168,7 +179,7 @@ public class ClassManager {
             }
         }
         List<FieldModel> baseClassFields = baseClassModel.getFields();
-        if (baseClassFields.size() <= 0){
+        if (baseClassFields.size() <= 0) {
             return classModelList;
         }
         for (ClassModel classModel : classModelList) {
@@ -181,7 +192,7 @@ public class ClassManager {
                         found = true;
                     }
                 }
-                if (!found){
+                if (!found) {
                     fields.add(fieldModel);
                 }
             }
@@ -189,5 +200,13 @@ public class ClassManager {
         }
         classModelList.add(baseClassModel);
         return classModelList;
+    }
+
+    public void clenUpClassModels(List<ClassModel> classModelList) {
+        // TODO: 09/06/17 Same model repeating check. [Use one for both]
+        // TODO: 09/06/17 Same name repeated for diff. models. [Change name for both]
+        for (ClassModel classModel : classModelList) {
+            Log.d("zfafaf", "classModelList = [" + classModel + "]");
+        }
     }
 }
