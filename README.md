@@ -1,6 +1,6 @@
 ## QAssist - Android Studio Plugin
 
-This plugin is intented to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only, this can be be used to Integrate Retrofit to your project(for server communications). Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
+This plugin is intended to reduce effort of Android application development by generating common code accross various applications. Now we completed retrofit integrator only, this can be be used to Integrate Retrofit to your project(for server communications). Please do aware **This Plugin is only for Android Studio and IntelliJ IDEA**.
 
 1. Integrate Retrofit to your project.
 2. ...
